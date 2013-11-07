@@ -1,5 +1,6 @@
 //I_node.c
 //Sortafine Industries
+#include blockio.h
 
 compare_component_tobuff
 	

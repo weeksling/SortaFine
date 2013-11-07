@@ -1,5 +1,6 @@
 //Sortafine.c
 //Sortafine Industries
+#include blockio.h
 
 sfs_read
 	get_inode_table
@@ -46,5 +47,6 @@ sfs_delete
 sfs_initilize
 	get_inode_table
 	get_super_blk
+	put_block
 	put_inode_table
 	put_super_blk
