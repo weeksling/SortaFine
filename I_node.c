@@ -2,11 +2,14 @@
 //Sortafine Industries
 #include blockio.h
 
-compare_component_tobuff
-	
-get_empty_blk
-	// dependant on put_super_blk
-	// dependant on get_super_blk
+char buff[1024];
+char *point;
+int blocknum;
+
+// 
+int compare_component_tobuff(char *comp, char *buff){
+
+}
 get_fd
 	// dependant on get_block
 get_file
@@ -27,12 +30,6 @@ put_inode_table
 	// put_block
 put_super_blk
 	// put_block
-release_allblocks_fromfile
-	// release_block
-	// put_inode_table
-release_block
-	// get_super_blk
-	// put_super_blk
 set_fd
 	// get_block
 	// put_block
