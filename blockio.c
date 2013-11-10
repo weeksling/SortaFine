@@ -8,6 +8,7 @@
 #include <limits.h>
 #include <unistd.h>
 #include <stdio.h>
+#include "blockio.h"
 
 /* file for storing simulated disk's data */
 #define DISKFILE "simdisk.data"
@@ -129,4 +130,8 @@ put_block(int blknum,
     return(-1);
   }
   return(0);
+}
+
+int main(void){
+  return 0;
 }
