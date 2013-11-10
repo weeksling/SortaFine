@@ -130,3 +130,7 @@ put_block(int blknum,
   }
   return(0);
 }
+
+int main(void) {
+  return 0;
+}
