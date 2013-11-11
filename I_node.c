@@ -27,11 +27,9 @@ void get_fd(void);
 	// get_block
 void get_file(void);
 	// get_block
-void get_refrence_count(void);
-	// get_block
 void set_fd(void);
 	// get_block
-	// put_block
+	// put_block	
 
 // Global Variables //
 int** i_node_table=NULL; 

@@ -11,9 +11,11 @@
 // Function Declarations //
 int put_file(int file_type, char* name);
 
-void set_refrence_count(void);
+int set_refrence_count(int* ref_count);
 	// get_block
 	// put_block
+int get_refrence_count(int* ref_count);
+	// get_block
 
 void get_file(void);
 
