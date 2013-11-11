@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #define BUFFER_SIZE 512
 #define BITMAP_BUFF 512
+#define ROOT_DIR 11
 
 int release_allblocks_fromfile(void);
 int release_block(int blk_num);
