@@ -1,7 +1,8 @@
-// Compile with: gcc -Wall -std=c99 bitmap.c -lm blockio.c
+// Compile with: gcc -Wall -std=c99 bitmap.c -lm blockio.c I_node.c
 
 #include <math.h>
 #include "blockio.h"
+#include "I_node.h"
 #include <stdio.h>
 #include <stdlib.h>
 #define BUFFER_SIZE 512

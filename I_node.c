@@ -19,7 +19,7 @@ int set_file_pointer(int i_number, int* file_ptr);
 	// put_block
 int get_file_pointer(int i_number, int* file_ptr);
 	// get_block
-int get_inode_table(void);
+int get_inode_table(int** table);
 	// get_block
 int put_inode_table(void);
 	// put_block
@@ -38,12 +38,12 @@ void set_refrence_count(void);
 
 // Global Variables //
 int** i_node_table=NULL; 
-char* buff=NULL;
+char* buffer=NULL;
 int** file_pointer=NULL;
 
 // Function Definitions //
-int main (void){
-	buff=(char*)calloc(BUFFER_SIZE,sizeof(char));
+/*int main (void){
+	buffer=(char*)calloc(BUFFER_SIZE,sizeof(char));
 	file_pointer=(int**)calloc(COMPONENTS,sizeof(int*));
 	i_node_table=(int**)calloc(BLOCKS, COMPONENTS*sizeof(int));
 	printf("this is %i \n",get_inode_table());
@@ -52,33 +52,38 @@ int main (void){
 			printf(" %i |",i_node_table[i][j]);
 		} printf("\n");
 	}
-}
+}*/
 
 int set_file_pointer(int i_number, int* file_ptr){
-	put_block(FILE_POINTER+i_number, file_ptr);
+	put_block(FILE_POINTER+i_number, (char*)file_ptr);
+	return 0;
 }
 
 
 int get_file_pointer(int i_number, int* file_ptr){
 	// file_pointer is the 10th block
-	get_block(FILE_POINTER, (char*)buff);
-	int** temp = (int**) buff;
+	get_block(FILE_POINTER, (char*)buffer);
+	int** temp = (int**) buffer;
 	file_ptr = temp[i_number];
 	free(temp);
+	return 0;
 }
 
-int get_inode_table(void){
+int get_inode_table(int** table){
 	for (int file=0;file<BLOCKS; file++){
-		get_block(I_NODE_START+file, buff);
-		i_node_table[file]=(int*)buff;
+		get_block(I_NODE_START+file, buffer);
+		i_node_table[file]=(int*)buffer;
 	}
+	table = i_node_table;
+	return 0;
 }
 
 int put_inode_table(){
 	for (int file=0; file<BLOCKS; file++){
-		strcpy(buff,(char*)i_node_table);
-		put_block(I_NODE_START+file, buff);
+		strcpy(buffer,(char*)i_node_table);
+		put_block(I_NODE_START+file, buffer);
 	}
+	return 0;
 }
 
 /**
