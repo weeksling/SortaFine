@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <malloc.h>
+#include <stdio.h>
 
 // Common Values //
 #define BLOCKS 8
@@ -19,7 +20,7 @@ void get_file(void);
 	// get_block
 int get_file_pointer(int i_number, int* file_ptr);
 	// get_block
-void get_inode_table(void);
+int get_inode_table(void);
 	// get_block
 void get_refrence_count(void);
 	// get_block
@@ -43,31 +44,47 @@ void set_refrence_count(void);
 int compare_component_tobuff(char *comp, char *buff);
 
 // Global Variables //
-int i_node_table[BLOCKS][COMPONENTS]; 
+int** i_node_table=NULL; 
 char* buff=NULL;
-int* file_pointer=NULL;
+int** file_pointer=NULL;
 
 // Function Definitions //
-int main (){
+int main (void){
 	buff=(char*)calloc(BUFFER_SIZE,sizeof(char));
-	file_pointer=(int*)calloc(64,COMPONENTS*sizeof(int));
+	file_pointer=(int**)calloc(COMPONENTS,sizeof(int*));
+	i_node_table=(int**)calloc(BLOCKS, COMPONENTS*sizeof(int));
+	printf("this is %i \n",get_inode_table());
+	for (int i =0; i<BLOCKS;i++){
+		for(int j=0; j<COMPONENTS; j++){
+			printf(" %i |",i_node_table[i][j]);
+		} printf("\n");
+	}
 }
-int compare_component_tobuff(char *comp, char *buff){
-	return strcmp(comp,buff);
+
+
+int get_inode_table(void){
+	for (int file=0;file<BLOCKS; file++){
+		get_block(I_NODE_START+file, buff);
+		i_node_table[file]=(int*)buff;
+	}
 }
 
 int put_inode_table(){
 	for (int file=0; file<BLOCKS; file++){
-		buff=(char*)i_node_table;
+		strcpy(buff,(char*)i_node_table);
 		put_block(I_NODE_START+file, buff);
 	}
 }
 
 int get_file_pointer(int i_number, int* file_ptr){
 	// file_pointer is the 10th block
-	get_block(FILE_POINTER, (char*)file_ptr);
-	/*int* temp = (int*) buff;
+	get_block(FILE_POINTER, (char*)buff);
+	int** temp = (int**) buff;
 	file_ptr = temp[i_number];
-	free(temp);*/
-	return 1;
+	free(temp);
+}
+
+
+int compare_component_tobuff(char *comp, char *buff){
+	return strcmp(comp,buff);
 }
