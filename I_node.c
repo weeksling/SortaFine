@@ -26,10 +26,6 @@ void get_refrence_count(void);
 	// get_block
 void get_super_blk(void);
 	// get_block
-void put_file(void);
-	// get_empty_blk
-	// put_inode_table
-	// put_block
 int put_inode_table(void);
 	// put_block
 void set_fd(void);

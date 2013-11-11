@@ -8,6 +8,7 @@
 #define BUFFER_SIZE 512
 #define BITMAP_BUFF 512
 
+int put_file(int file_type, char* name);
 int get_super_blk(void);
 int put_super_blk(void);
 int get_empty_blk(int* freeblk);
@@ -18,6 +19,16 @@ short int* super_blk_buf = NULL;
 int* disk_bitmap = NULL;
 char* buff = NULL;
 
+
+void put_file(int file_type, char* name){
+	int space = get_empty_blk();
+	int** I_node_buff = get_inode_table();
+	
+
+} // Not finished yet!
+	// get_empty_blk
+	// put_inode_table
+	// put_block
 int release_allblocks_fromfile(void){
 	// release_block
 	// put_inode_table
