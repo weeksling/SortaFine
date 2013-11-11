@@ -35,7 +35,7 @@ int put_inode_table(void);
 void set_fd(void);
 	// get_block
 	// put_block
-void set_file_pointer(void);
+int set_file_pointer(int i_number, int* file_ptr);
 	// get_block
 	// put_block
 void set_refrence_count(void);
@@ -61,6 +61,9 @@ int main (void){
 	}
 }
 
+int set_file_pointer(int i_number, int* file_ptr){
+	put_block(FILE_POINTER+i_number, file_ptr);
+}
 
 int get_inode_table(void){
 	for (int file=0;file<BLOCKS; file++){
@@ -88,3 +91,23 @@ int get_file_pointer(int i_number, int* file_ptr){
 int compare_component_tobuff(char *comp, char *buff){
 	return strcmp(comp,buff);
 }
+
+/**
+*Structure of I_Node table will be:
+*BLOCK 2:
+*Location
+*Block 3:
+*size
+*Block 4:
+*ref_count
+*Block 5:
+*
+*Block 6:
+*
+*Block 7:
+*
+*Block 8:
+*
+*Block 9:
+**/
+
