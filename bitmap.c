@@ -40,9 +40,19 @@ int release_block(int blk_num){
 	return 0;
 }
 int get_empty_blk(int* freeblk){
-	// dependant on put_super_blk
-	// dependant on get_super_blk
-	// Returns the location of the found empty block
+	for (int e = 11; e < BITMAP_BUFF; e+4)
+	{	
+		if(disk_bitmap[blk_num] == NULL){
+			return -1;
+		}
+		if(disk_bitmap[blk_num] == 0){
+			freeblk = e;
+			return 1;
+			break;
+			}
+		}
+		return -1;
+	}
 	return 0;
 }
 int get_super_blk(void){
