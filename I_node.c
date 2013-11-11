@@ -42,17 +42,11 @@ char* buffer=NULL;
 int** file_pointer=NULL;
 
 // Function Definitions //
-/*int main (void){
+int main (void){
 	buffer=(char*)calloc(BUFFER_SIZE,sizeof(char));
 	file_pointer=(int**)calloc(COMPONENTS,sizeof(int*));
 	i_node_table=(int**)calloc(BLOCKS, COMPONENTS*sizeof(int));
-	printf("this is %i \n",get_inode_table());
-	for (int i =0; i<BLOCKS;i++){
-		for(int j=0; j<COMPONENTS; j++){
-			printf(" %i |",i_node_table[i][j]);
-		} printf("\n");
-	}
-}*/
+}
 
 int set_file_pointer(int i_number, int* file_ptr){
 	put_block(FILE_POINTER+i_number, (char*)file_ptr);
