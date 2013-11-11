@@ -11,6 +11,9 @@
 // Function Declarations //
 int put_file(int file_type, char* name);
 
+void set_refrence_count(void);
+	// get_block
+	// put_block
 
 void get_file(void);
 
@@ -19,6 +22,10 @@ void get_file(void);
 short int* super_blk_buf = NULL;
 int* disk_bitmap = NULL;
 char* buff = NULL;
+
+void set_refrence_count(void);
+	// get_block
+	// put_block
 
 
 // Function Definitions //

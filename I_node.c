@@ -32,9 +32,6 @@ void get_refrence_count(void);
 void set_fd(void);
 	// get_block
 	// put_block
-void set_refrence_count(void);
-	// get_block
-	// put_block
 
 // Global Variables //
 int** i_node_table=NULL; 
