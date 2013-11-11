@@ -9,7 +9,7 @@
 #define ROOT_DIR 11
 
 int release_allblocks_fromfile(void);
-int release_block(int blk_num);toWrite;
+int release_block(int blk_num);
 int get_empty_blk(int* freeblk);
 int get_super_blk(void);
 int put_super_blk(void);
@@ -47,9 +47,8 @@ int get_empty_blk(int* freeblk){
 			return -1;
 		}
 		if(disk_bitmap[e] == 0){
-			int* rekd;
-			get_file_pointer(e, rekd);
-			return rekd;
+			get_file_pointer(e, freeblk);
+			return 1;
 			break;
 		}
 		return -1;
@@ -97,7 +96,6 @@ int put_super_blk(void){
 	buff = (char*) calloc(BUFFER_SIZE, sizeof(char));
 
 	int bitmap_pos = 0;
-	int current = 0;
 	int length = sizeof(super_blk_buf)/sizeof(short int);
 	int toWrite = 0;
 
