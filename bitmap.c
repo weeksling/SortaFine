@@ -78,7 +78,7 @@ int get_super_blk(void){
 			for(int j=3; j>=0; j--) {
 				if (current >= pow(2,j)) {
 					disk_bitmap[bitmap_pos] = 1;
-					current = current - pow(2.0,(double)j);
+					current = current - pow(2,j);
 				} else {
 					disk_bitmap[bitmap_pos] = 0;
 				}
@@ -102,18 +102,23 @@ int put_super_blk(void){
 	int toWrite = 0;
 
 	for (int a=0; a<=1; a++) {
-		int result = get_block(a, buff);
-		super_blk_buf = (short int*) buff;
 
+		for(int i=0; i<length; i++) {
+			toWrite = 0;
+			for(int j=3; j>=0; j--) {
+				if(disk_bitmap[bitmap_pos] == 1) {
+					toWrite = toWrite + pow(2,j);
+				}
+				bitmap_pos++;
+			}
+			super_blk_buf[i] = toWrite;
+		}
+		buff = (char*) super_blk_buf;
+		int result = put_block(a, buff);
 		if (result < 0) {
 			return -1;
 		}
 
-		for(int i=0; i<length; i++) {
-			current = disk_bitmap[i];
-
-			
-		}
 	}
 	return 0;
 }
