@@ -1,5 +1,9 @@
+// Compile with: gcc -Wall -std=c99 bitmap.c -lm blockio.c
+
 #include <math.h>
 #include "blockio.h"
+#include <stdio.h>
+#include <stdlib.h>
 #define BUFFER_SIZE 512
 #define BITMAP_BUFF 512
 
@@ -78,5 +82,27 @@ int put_super_blk(void){
 	//Encode each 4 locations of diskbitmap[512] into an integer and puts
 	// it in super_blk_buf[128]
 	// Puts super_blk_buf[128] into the super-block
+	char* buff = NULL;
+	buff = (char*) calloc(BUFFER_SIZE, sizeof(char));
+
+	int bitmap_pos = 0;
+	int current = 0;
+	int length = sizeof(super_blk_buf)/sizeof(short int);
+	int toWrite = 0;
+
+	for (int a=0; a<=1; a++) {
+		int result = get_block(a, buff);
+		super_blk_buf = (short int*) buff;
+
+		if (result < 0) {
+			return -1;
+		}
+
+		for(int i=0; i<length; i++) {
+			current = disk_bitmap[i];
+
+			
+		}
+	}
 	return 0;
 }
