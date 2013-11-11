@@ -9,7 +9,7 @@
 #define ROOT_DIR 11
 
 int release_allblocks_fromfile(void);
-int release_block(int blk_num);
+int release_block(int blk_num);toWrite;
 int get_empty_blk(int* freeblk);
 int get_super_blk(void);
 int put_super_blk(void);
@@ -41,16 +41,16 @@ int release_block(int blk_num){
 	return 0;
 }
 int get_empty_blk(int* freeblk){
-	for (int e = 11; e < BITMAP_BUFF; e+4)
+	for(int e = 11; e < BITMAP_BUFF; e++)
 	{	
-		if(disk_bitmap[blk_num] == NULL){
+		if(disk_bitmap == NULL){
 			return -1;
 		}
-		if(disk_bitmap[blk_num] == 0){
-			freeblk = e;
-			return 1;
+		if(disk_bitmap[e] == 0){
+			int* rekd;
+			get_file_pointer(e, rekd);
+			return rekd;
 			break;
-			}
 		}
 		return -1;
 	}
