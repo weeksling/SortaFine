@@ -63,15 +63,21 @@ int close_fd(int fd){
 		else{
 			reference_count[fd]--;
 			fd_table[fd]=0;
+			return 1;
 		}
 	}
 }
 
 int set_refrence_count(int fd, int ref){
-	reference_count[fd] = ref;
+	if (ref>=0){
+		reference_count[fd] = ref;
+		return 1;
+	} 
+	return -1;
 }
 	// get_block
 	// put_block
 int get_reference_count(int fd, int* ref_buf){
 	*ref_buf=reference_count[fd];
+	return 1;
 }
