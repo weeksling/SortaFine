@@ -41,7 +41,21 @@ void sfs_open(char* pathname){
 		set_reference_count
 		set_fd*/
 void sfs_close(int fd){
-	
+	int* count = NULL;
+	////////////////////////////////////////////////////
+	get_fd();
+	////////////////////////////////////////////////////
+	error_check = get_reference_count(fd, count);
+	if(error_check==-1){
+		printf("There was a problem getting refrence count.\n");
+	}
+	error_check = set_reference_count(fd, &count-1);
+	if(error_check==-1){
+		printf("There was a problem setting reference count\n", );
+	}
+	////////////////////////////////////////////////////
+	set_fd();
+	////////////////////////////////////////////////////
 }
 	/*	get_fd
 		get_reference_count
@@ -83,12 +97,12 @@ void sfs_initilize(int erase){
 	if(error_check==-1){
 		printf("Error in putting super_blk back\n");
 	}
-	error_check = get_inode_table
+	error_check = get_inode_table();
 	if(error_check==-1){
 		printf("Error in geting inode table.\n");
 	}
-	error_check = put_inode_table
-	if(error_check = -1){
+	error_check = put_inode_table();
+	if(error_check== -1){
 		printf("Error in putting the inode table.\n");
 	}
 }
