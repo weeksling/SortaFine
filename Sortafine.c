@@ -1,6 +1,7 @@
 //Sortafine.c
 //Sortafine Industries
 #include "blockio.h"
+#include "open_file_table.h"
 #include <string.h>
 #include <stdlib.h>
 #include <malloc.h>
@@ -38,12 +39,18 @@ void sfs_write(int fd, int start, int length, char* mem_pointer){
 		put_file*/
 void sfs_open(char* pathname){
 
-	get_block(11, buffer);
-	int pntStr = strstr(buffer, pathname);
-	int length = sizeof(pathname)/sizeof(int);
-	pnt = pntStr + length;
-	int pntEnd = strstr(buffer, '\n');
-	
+	get_block(11, buff);
+	char* pntStr = strstr(buff, pathname);
+	if(pntStr == NULL){
+		printf("FILE NOT FOUND");
+		return;
+	}
+	int length = sizeof(pathname)/sizeof(char);
+	pntStr+=length;
+	char* pntEnd = strstr(buff, "\n");
+	char* store = NULL;
+	strncpy(store, pntStr, pntEnd-pntStr);
+	int* loc = (int) store;
 	//
 	set_fd(loc);
 
