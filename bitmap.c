@@ -1,3 +1,8 @@
+/** 
+  * @author Adam Pacheco, Matthew Weeks, Blair Wiser
+  * @version 0.1
+  * @since 2013-11-11
+  */
 // Compile with: gcc -Wall -std=c99 bitmap.c -lm blockio.c I_node.c
 
 #include <math.h>
@@ -20,6 +25,10 @@ short int* super_blk_buf = NULL;
 int* disk_bitmap = NULL;
 char* buff = NULL;
 
+/** 
+  * Set all entries of disk_bitmap to 0, marking them as free
+  * @return 0 	if successful, -1 otherwise
+  */
 int release_allblocks_fromfile(void){
 	// release_block
 	// put_inode_table
@@ -32,6 +41,12 @@ int release_allblocks_fromfile(void){
 	}
 	return 0;
 }
+
+/** 
+  * Set specified block in disk_bitmap to 0, marking it as free
+  * @param blk_num 	the block number of the block to be freed
+  * @return 0 		if successful, -1 otherwise
+  */
 int release_block(int blk_num){
 	// get_super_blk
 	// put_super_blk
@@ -41,6 +56,12 @@ int release_block(int blk_num){
 	disk_bitmap[blk_num] = 0;
 	return 0;
 }
+
+/** 
+  * Find the next free block in disk_bitmap
+  * @param freeblk 	pointer to integer where free block is stored in once it is found
+  * @return 0 		if successful, -1 otherwise
+  */
 int get_empty_blk(int* freeblk){
 	for(int e = 11; e < BITMAP_BUFF; e++)
 	{	
@@ -56,6 +77,11 @@ int get_empty_blk(int* freeblk){
 	}
 	return 0;
 }
+
+/** 
+  * Reads superblock from disk and initializes disk_bitmap
+  * @return 0 	if successful, -1 otherwise
+  */
 int get_super_blk(void){
 	//super_blk_buf = (short int*) calloc(BUFFER, sizeof(short int));
 	disk_bitmap = (int*) calloc(BITMAP_BUFF, sizeof(int));
@@ -86,9 +112,16 @@ int get_super_blk(void){
 			}
 		}
 	}
+	free(buff);
+	free(super_blk_buf);
+
 	return 0;
 }
 
+/** 
+  * Writes contents of disk_bitmap to the disk
+  * @return 0 	if successful, -1 otherwise
+  */
 int put_super_blk(void){
 	//Encode each 4 locations of diskbitmap[512] into an integer and puts
 	// it in super_blk_buf[128]
@@ -119,5 +152,8 @@ int put_super_blk(void){
 		}
 
 	}
+	free(buff);
+	free(super_blk_buf);
+
 	return 0;
 }
