@@ -2,19 +2,37 @@
 //Sortafine Industries
 #include blockio.h
 
-void sfs_read(int fd, int start, int length, char* mem_pointer)
+int error_check = 0;
+
+void sfs_read(int fd, int start, int length, char* mem_pointer);
+void sfs_write(int fd, int start, int length, char* mem_pointer);
+void sfs_open(char* pathname);
+void sfs_close(int fd);
+void sfs_create(char* pathname);
+void sfs_delete(char* pathname);
+void sfs_initilize(int erase);
+
+
+
+void sfs_read(int fd, int start, int length, char* mem_pointer){
+
+}
 	/*	get_inode_table
 		get_fd
 		get_file
 		get_file_pointer*/
-void sfs_write(int fd, int start, int length, char* mem_pointer)
+void sfs_write(int fd, int start, int length, char* mem_pointer){
+
+}
 	/*	get_file_pointer
 		get_inode_table
 		get_fd
 		get_file
 		set_file_pointer
 		put_file*/
-void sfs_open(char* pathname)
+void sfs_open(char* pathname){
+
+}
 	/*	get_reference_count
 		get_inode_table
 		compare_component_tobuff
@@ -22,12 +40,16 @@ void sfs_open(char* pathname)
 		get_file
 		set_reference_count
 		set_fd*/
-void sfs_close(int fd)
+void sfs_close(int fd){
+	
+}
 	/*	get_fd
 		get_reference_count
 		set_fd
 		set_reference_count*/
-void sfs_create(char* pathname)
+void sfs_create(char* pathname){
+
+}
 	/*	get_inode_table
 		compare_component_tobuff
 		get_file_pointer
@@ -35,7 +57,9 @@ void sfs_create(char* pathname)
 		set_file_pointer
 		get_empty_blk
 		put_inode_table*/
-void sfs_delete(char* pathname)
+void sfs_delete(char* pathname){
+
+}
 	/*	get_inode_table
 		get_file_pointer
 		compare_component_tobuff
@@ -44,7 +68,30 @@ void sfs_delete(char* pathname)
 		set_file_pointer
 		release_allblocks_fromfiles
 		put_file*/
-void sfs_initilize(int erase)
+void sfs_initilize(int erase){
+	if(erase==1){
+		error_check=release_allblocks_fromfiles();
+		if(error_check==-1){
+			printf("Error freeing memory.\n");
+		}
+	}
+	error_check = get_super_blk();
+	if(error_check==-1){
+		printf("Error in get super blk\n");
+	}
+	error_check=put_super_blk();
+	if(error_check==-1){
+		printf("Error in putting super_blk back\n");
+	}
+	error_check = get_inode_table
+	if(error_check==-1){
+		printf("Error in geting inode table.\n");
+	}
+	error_check = put_inode_table
+	if(error_check = -1){
+		printf("Error in putting the inode table.\n");
+	}
+}
 	/*	get_inode_table
 		get_super_blk
 		put_block
