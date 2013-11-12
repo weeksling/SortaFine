@@ -2,6 +2,7 @@
 //Sortafine Industries
 #include "blockio.h"
 #include "open_file_table.h"
+#include "I_node.h"
 #include <string.h>
 #include <stdlib.h>
 #include <malloc.h>
