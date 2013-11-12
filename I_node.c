@@ -23,13 +23,8 @@ int get_inode_table(int** table);
 	// get_block
 int put_inode_table(void);
 	// put_block
-void get_fd(void);
-	// get_block
 void get_file(void);
-	// get_block
-void set_fd(void);
-	// get_block
-	// put_block	
+	// get_block	
 
 // Global Variables //
 int** i_node_table=NULL; 
