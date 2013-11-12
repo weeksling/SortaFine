@@ -1,8 +1,14 @@
 //Sortafine.c
 //Sortafine Industries
-#include blockio.h
+#include "blockio.h"
+#include <string.h>
+#include <stdlib.h>
+#include <malloc.h>
+#include <stdio.h>
 
 int error_check = 0;
+char* buff = NULL;
+int* count = NULL;
 
 void sfs_read(int fd, int start, int length, char* mem_pointer);
 void sfs_write(int fd, int start, int length, char* mem_pointer);
@@ -32,6 +38,28 @@ void sfs_write(int fd, int start, int length, char* mem_pointer){
 		put_file*/
 void sfs_open(char* pathname){
 
+	get_block(11, buffer);
+	int pntStr = strstr(buffer, pathname);
+	int length = sizeof(pathname)/sizeof(int);
+	pnt = pntStr + length;
+	int pntEnd = strstr(buffer, '\n');
+	
+	//
+	set_fd(loc);
+
+	///////////////////////////////////////////////////////////
+	
+	error_check = get_reference_count(fd, count);
+	if(error_check==-1){
+		printf("There was a problem getting refrence count.\n");
+	}
+	error_check = set_reference_count(fd, *count+1);
+	if(error_check==-1){
+		printf("There was a problem setting reference count\n", );
+	}
+	///////////////////////////////////////////////////////////
+	//set_fd();
+	///////////////////////////////////////////////////////////
 }
 	/*	get_reference_count
 		get_inode_table
@@ -41,7 +69,6 @@ void sfs_open(char* pathname){
 		set_reference_count
 		set_fd*/
 void sfs_close(int fd){
-	int* count = NULL;
 	////////////////////////////////////////////////////
 	get_fd();
 	////////////////////////////////////////////////////
@@ -49,7 +76,7 @@ void sfs_close(int fd){
 	if(error_check==-1){
 		printf("There was a problem getting refrence count.\n");
 	}
-	error_check = set_reference_count(fd, &count-1);
+	error_check = set_reference_count(fd, *count-1);
 	if(error_check==-1){
 		printf("There was a problem setting reference count\n", );
 	}
