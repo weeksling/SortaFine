@@ -174,6 +174,17 @@ void sfs_initilize(int erase){
 		printf("Error in putting the inode table.\n");
 	}
 }
+
+int sfs_exist(char* pathname)){
+	get_block(11, buff);
+	char* pntStr = strstr(buff, pathname);
+	if(pntStr == NULL){
+		return 0;
+	}else{
+		return 1;
+	}
+	return -1;
+}
 	/*	get_inode_table
 		get_super_blk
 		put_block
