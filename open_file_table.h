@@ -1,11 +1,11 @@
 #ifndef OPEN_FILE_TABLE_GUARD
 #define OPEN_FILE_TABLE_GUARD
 extern int
- set_refrence_count(int fd, int ref);
+ set_reference_count(int fd, int ref);
 	// get_block
 	// put_block
 extern int
- get_refrence_count(int fd, int* ref_buf);
+ get_reference_count(int fd, int* ref_buf);
 	// get_block
 
 extern int

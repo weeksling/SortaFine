@@ -1,6 +1,6 @@
 //super_block.c
 //Sortafine Industries
-//Compile with: gcc -Wall -std=c99 open_file.c -lm blockio.c
+//Compile with: gcc -Wall -std=c99 open_file_table.c -lm blockio.c
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -10,10 +10,10 @@
 #define FD_SIZE 4
 
 // Function Declarations //
-int set_refrence_count(int fd, int ref);
+int set_reference_count(int fd, int ref);
 	// get_block
 	// put_block
-int get_refrence_count(int fd, int* ref_buf);
+int get_reference_count(int fd, int* ref_buf);
 	// get_block
 
 int set_fd(int loc);
@@ -27,11 +27,8 @@ int close_fd(int fd);
 
 
 // Global Variables //
-short int* super_blk_buf = NULL;
-int* disk_bitmap = NULL;
 int* reference_count=NULL;
 int* fd_table=NULL;
-char* buff = NULL;
 
 
 // Function Definitions //
@@ -68,7 +65,7 @@ int close_fd(int fd){
 	}
 }
 
-int set_refrence_count(int fd, int ref){
+int set_reference_count(int fd, int ref){
 	if (ref>=0){
 		reference_count[fd] = ref;
 		return 1;

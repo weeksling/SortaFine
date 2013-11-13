@@ -2,16 +2,23 @@
 //Sortafine Industries
 #include "blockio.h"
 #include "open_file_table.h"
+#include "bitmap.h"
 #include "I_node.h"
 #include <string.h>
 #include <stdlib.h>
 #include <malloc.h>
 #include <stdio.h>
+//<<<<<<< Updated upstream
 #define BLOCK_SIZE 128
 #define BUFFER_SIZE 512
 
+//=======
+#define BLOCKS 8
+#define COMPONENTS 64
+#define DATA_START 11
+//>>>>>>> Stashed changes
 int error_check = 0;
-char* buff = NULL;
+char* sfs_buff = NULL;
 int* count = NULL;
 
 void sfs_read(int fd, int start, int length, char* mem_pointer);
@@ -22,41 +29,46 @@ void sfs_create(char* pathname);
 void sfs_delete(char* pathname);
 void sfs_initilize(int erase);
 
+
+int main (void){
+	return 0;
+}
+
 void sfs_read(int fd, int start, int length, char* mem_pointer){
 //Make sure the fetching is correct
-	int i_number = get_fd(fd);
-	int* node_buff = NULL;
-	int* size = NULL; 
-	int* i_node = NULL;
-	int to_read = 0;
-	int current;
-	int buff_length;
-	int position = 0;
-	buff = calloc(BUFFER_SIZE, sizeof(char*));
+        int i_number = get_fd(fd);
+        //int* node_buff = NULL;
+        int* size = NULL; 
+        int* i_node = NULL;
+        int to_read = 0;
+        int current;
+        int buff_length=0; // WUT??? this never got defined... like ever... dude... I'm so high.. this is fun. kk bai put a sloth
+        int position = 0;
+        sfs_buff = calloc(BUFFER_SIZE, sizeof(char*));
 
-	if (i_number < 0) {
-		return void;
-	}
+        if (i_number < 0) {
+                return;
+        }
 
-	get_file_pointer(i_number, size);
-	get_inode = (i_number, i_node);
+        get_file_pointer(i_number, size);
+        //get_inode = (i_number, i_node);
 
-	while(start > BLOCK_SIZE) {
-		start = start - BLOCK_SIZE;
-		to_read++;
-	}
+        while(start > BLOCK_SIZE) {
+                start = start - BLOCK_SIZE;
+                to_read++;
+        }
 
-	do {
-		current = start;
-		get_block(i_node[to_read], buff);
-		length = sizeof(buff)/sizeof(char*);
-		while(current <= start+length || current <= buff_length) {
-			mem_pointer[position] = buff[current];
-			current++;
-			position++;
-		}
-		start = 0;
-	} while(position <= length);
+        do {
+                current = start;
+                get_block(i_node[to_read], sfs_buff);
+                length = sizeof(sfs_buff)/sizeof(char*);
+                while(current <= start+length || current <= buff_length) {
+                        mem_pointer[position] = sfs_buff[current];
+                        current++;
+                        position++;
+                }
+                start = 0;
+        } while(position <= length);
 }
 	/*	get_inode_table
 		get_fd
@@ -73,21 +85,24 @@ void sfs_write(int fd, int start, int length, char* mem_pointer){
 		put_file*/
 void sfs_open(char* pathname){
 
-	get_block(11, buff);
-	char* pntStr = strstr(buff, pathname);
+	get_block(DATA_START, sfs_buff);
+	char* pntStr = strstr(sfs_buff, pathname);
 	if(pntStr == NULL){
 		printf("FILE NOT FOUND");
 		return;
 	}
 	int length = sizeof(pathname)/sizeof(char);
 	pntStr+=length;
-	char* pntEnd = strstr(buff, "\n");
-	char* store = NULL;
+	char* pntEnd = strstr(sfs_buff, "\n");
+	char* store = calloc(1,sizeof(sfs_buff));
 	strncpy(store, pntStr, pntEnd-pntStr);
-	int* loc = (int) store;
+	int* loc = (int*) store;
 	//
-	set_fd(loc);
-
+	int fd = set_fd(*loc);
+	if (fd < 0){
+		printf("Could not open file!");
+		return;
+	}
 	///////////////////////////////////////////////////////////
 	
 	error_check = get_reference_count(fd, count);
@@ -96,7 +111,7 @@ void sfs_open(char* pathname){
 	}
 	error_check = set_reference_count(fd, *count+1);
 	if(error_check==-1){
-		printf("There was a problem setting reference count\n", );
+		printf("There was a problem setting reference count\n");
 	}
 	///////////////////////////////////////////////////////////
 	//set_fd();
@@ -111,7 +126,7 @@ void sfs_open(char* pathname){
 		set_fd*/
 void sfs_close(int fd){
 	////////////////////////////////////////////////////
-	get_fd();
+	get_fd(fd);
 	////////////////////////////////////////////////////
 	error_check = get_reference_count(fd, count);
 	if(error_check==-1){
@@ -119,10 +134,10 @@ void sfs_close(int fd){
 	}
 	error_check = set_reference_count(fd, *count-1);
 	if(error_check==-1){
-		printf("There was a problem setting reference count\n", );
+		printf("There was a problem setting reference count\n");
 	}
 	////////////////////////////////////////////////////
-	set_fd();
+	close_fd(fd);
 	////////////////////////////////////////////////////
 }
 	/*	get_fd
@@ -175,17 +190,20 @@ void sfs_initilize(int erase){
 		printf("Error in putting the inode table.\n");
 	}
 	free(i_node_buff);
+//<<<<<<< Updated upstream
 }
 
-int sfs_exist(char* pathname)){
-	get_block(11, buff);
-	char* pntStr = strstr(buff, pathname);
+int sfs_exist(char* pathname){
+	get_block(11, sfs_buff);
+	char* pntStr = strstr(sfs_buff, pathname);
 	if(pntStr == NULL){
 		return 0;
 	}else{
 		return 1;
 	}
 	return -1;
+//=======
+//>>>>>>> Stashed changes
 }
 	/*	get_inode_table
 		get_super_blk

@@ -32,10 +32,20 @@ char* buffer=NULL;
 int** file_pointer=NULL;
 
 // Function Definitions //
-int main (void){
+/*int main (void){
 	buffer=(char*)calloc(BUFFER_SIZE,sizeof(char));
 	file_pointer=(int**)calloc(COMPONENTS,sizeof(int*));
 	i_node_table=(int**)calloc(BLOCKS, COMPONENTS*sizeof(int));
+}*/
+
+int inode_initialize(int erase){
+	//#ifndef INITIALIZED
+	if(erase == 0){
+		buffer=(char*)calloc(BUFFER_SIZE, sizeof(char));
+		file_pointer=(int**)calloc(COMPONENTS, sizeof(int*));
+		i_node_table=(int**)calloc (BLOCKS, COMPONENTS*sizeof(int));
+	}
+	return 0;
 }
 
 int set_file_pointer(int i_number, int* file_ptr){

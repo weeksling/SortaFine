@@ -10,14 +10,6 @@ extern int
 extern int
  put_inode_table(void);
 extern void
- get_fd(void);
-extern void
  get_file(void);
-extern void
- get_refrence_count(void);
-extern void
- set_fd(void);
-extern void
- set_refrence_count(void);
 
  #endif
