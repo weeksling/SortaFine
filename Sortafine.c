@@ -151,8 +151,9 @@ void sfs_delete(char* pathname){
 		release_allblocks_fromfiles
 		put_file*/
 void sfs_initilize(int erase){
+	int** i_node_buff=(int**)calloc(BLOCKS, COMPONENTS*sizeof(int));
 	if(erase==1){
-		error_check=release_allblocks_fromfiles();
+		error_check=release_allblocks_fromfile();
 		if(error_check==-1){
 			printf("Error freeing memory.\n");
 		}
@@ -165,7 +166,7 @@ void sfs_initilize(int erase){
 	if(error_check==-1){
 		printf("Error in putting super_blk back\n");
 	}
-	error_check = get_inode_table();
+	error_check = get_inode_table(i_node_buff);
 	if(error_check==-1){
 		printf("Error in geting inode table.\n");
 	}
@@ -173,6 +174,7 @@ void sfs_initilize(int erase){
 	if(error_check== -1){
 		printf("Error in putting the inode table.\n");
 	}
+	free(i_node_buff);
 }
 
 int sfs_exist(char* pathname)){
