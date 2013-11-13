@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <stdio.h>
+#define BLOCK_SIZE 128
+#define BUFFER_SIZE 512
 
 int error_check = 0;
 char* buff = NULL;
@@ -20,10 +22,41 @@ void sfs_create(char* pathname);
 void sfs_delete(char* pathname);
 void sfs_initilize(int erase);
 
-
-
 void sfs_read(int fd, int start, int length, char* mem_pointer){
+//Make sure the fetching is correct
+	int i_number = get_fd(fd);
+	int* node_buff = NULL;
+	int* size = NULL; 
+	int* i_node = NULL;
+	int to_read = 0;
+	int current;
+	int buff_length;
+	int position = 0;
+	buff = calloc(BUFFER_SIZE, sizeof(char*));
 
+	if (i_number < 0) {
+		return void;
+	}
+
+	get_file_pointer(i_number, size);
+	get_inode = (i_number, i_node);
+
+	while(start > BLOCK_SIZE) {
+		start = start - BLOCK_SIZE;
+		to_read++;
+	}
+
+	do {
+		current = start;
+		get_block(i_node[to_read], buff);
+		length = sizeof(buff)/sizeof(char*);
+		while(current <= start+length || current <= buff_length) {
+			mem_pointer[position] = buff[current];
+			current++;
+			position++;
+		}
+		start = 0;
+	} while(position <= length);
 }
 	/*	get_inode_table
 		get_fd
