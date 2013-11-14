@@ -227,11 +227,10 @@ void sfs_create(char* pathname){
 	if (error_check<0){
 		printf("Error.\n");
 	}
-	current_position = sfs_size+1;
-	sfs_buff[current_position] = pathname + " " + "\n"
+	current_position = *sfs_size+1;
 	strcat(sfs_buff,pathname);
 	strcat(sfs_buff," ");
-	strcat(sfs_buff,number_i);
+	strcat(sfs_buff,(char*)number_i);
 	strcat(sfs_buff,"\n");
 	free(sfs_buff);
 	free(sfs_size);
@@ -280,8 +279,8 @@ void sfs_delete(char* pathname){
 		printf("Error.\n");
 	}
 	strncpy(newDir, sfs_buff, temp_star);
-	strcat(newDir, strEnd);
-	putBlock(11, newDir);
+	strcat(newDir, pntEnd);
+	put_block(11, newDir);
 	free(sfs_size);
 	free(sfs_table);
 	free(pntStr);

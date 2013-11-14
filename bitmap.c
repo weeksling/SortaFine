@@ -65,7 +65,7 @@ int release_block(int blk_num){
 }
 
 int init_super_block(){
-	super_blk_buf=(shortint*) calloc(BLK_BUF_SIZE, sizeof(int));
+	super_blk_buf=(short int*) calloc(BLK_BUF_SIZE, sizeof(int));
 	disk_bitmap=(int*) calloc(DISK_SIZE, sizeof(int));
 	int error_check=get_super_blk();
 	return 0;
@@ -104,7 +104,7 @@ int get_super_blk(void){
 	int bitmap_pos = 0;
 	int current = 0;
 	int result = get_block(BITMAP_LOC, buff);
-	int* checksum=NULL
+	int* checksum=NULL;
 	int error_check = get_block(CHECKSUM_LOC,checksum);
 	super_blk_buf = (short int*) buff;
 
@@ -124,7 +124,7 @@ int get_super_blk(void){
 			bitmap_pos++;
 		}
 	}
-
+	int check=0;
 	for (int i=0; i<DISK_SIZE; i++){
 		check += buff[i];
 	}
@@ -154,7 +154,7 @@ int put_super_blk(void){
 	int length = sizeof(super_blk_buf)/sizeof(short int);
 	int toWrite = 0;
 
-	for(int i=0; i<; i++) {
+	for(int i=0; i<BLK_BUF_SIZE; i++) {
 		toWrite = 0;
 		for(int j=3; j>=0; j--) {
 			if(disk_bitmap[bitmap_pos] == 1) {
@@ -173,13 +173,11 @@ int put_super_blk(void){
 
 	int error_check = put_block(CHECKSUM_LOC, check);
 	int result = put_block(BITMAP_LOC, buff);
-	
+
 	if (result < 0 || error_check<0) {
 		return -1;
 	}
 
-
-	int check 
 	free(buff);
 	return 0;
 }

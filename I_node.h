@@ -13,5 +13,10 @@ extern int
  put_inode_table(void);
 extern void
  get_file(void);
-
+extern int
+ add_inode(int* new_inode);
+extern int
+ delete_inode(int i_num);
+extern int
+ set_inode(int i_num,int* new_inode);
  #endif
