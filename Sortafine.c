@@ -204,7 +204,37 @@ void sfs_close(int fd){
 		set_fd
 		set_reference_count*/
 void sfs_create(char* pathname){
-
+	sys_buff = calloc(BUFFER_SIZE, sizeof(char*));
+	int* location_blk;
+	int* sfs_size;
+	int number_i;
+	error_check = sfs_exists(pathname);
+	int current_pos;
+	if (error_check<0){
+		printf("Does not exist.\n");
+	});
+	error_check = get_empty_blk(location_blk);
+	if (error_check<0){
+		printf("No blocks free..\n");
+	}
+	number_i = add_inode(location_blk);
+	error_check = get_file_pointer(0,sfs_size);
+	if (error_check<0){
+		printf("Error.\n");
+	}
+	error_check = get_block(DATA_START, sfs_buff);
+	if (error_check<0){
+		printf("Error.\n");
+	}
+	current_position = sfs_size+1;
+	sfs_buff[current_position] = pathname + " " + "\n"
+	strcat(sfs_buff,pathname);
+	strcat(sfs_buff," ");
+	strcat(sfs_buff,number_i);
+	strcat(sfs_buff,"\n");
+	free(sfs_buff);
+	free(sfs_size);
+	free(location_blk);
 }
 	/*	get_inode_table
 		compare_component_tobuff
