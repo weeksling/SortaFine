@@ -19,7 +19,7 @@ int set_file_pointer(int i_number, int* file_ptr);
 	// put_block
 int get_file_pointer(int i_number, int* file_ptr);
 	// get_block
-int put_file_pointer();
+int put_file_pointer(void);
 	//put_block
 int get_inode_table(int** table);
 	// get_block
@@ -27,6 +27,11 @@ int put_inode_table(void);
 	// put_block
 void get_file(void);
 	// get_block	
+int get_empty_inode(void);
+
+int set_inode(int wrekd,int* new_inode);
+
+int add_inode(int* new_inode);
 
 // Global Variables //
 int** i_node_table=NULL; 
@@ -102,6 +107,29 @@ int put_inode_table(){
 		put_block(I_NODE_START+file, buffer);
 	}
 	return 0;
+}
+
+int get_empty_inode(){
+        for(int e = 0; e <COMPONENTS; e++)
+        {        
+        	if(i_node_table[e][0]==0){
+        		return e;
+        	}
+        }
+        return -1;
+}
+
+int set_inode(int i_num,int* new_inode){
+	i_node_table[i_num] = new_inode;
+	return 0;
+}
+
+int add_inode(int* new_inode){
+	int temp_loc = get_empty_inode();
+	if(temp_loc<0){
+		return -1;
+	}
+	i_node_table[temp_loc] = new_inode;
 }
 
 /**
