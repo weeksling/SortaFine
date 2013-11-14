@@ -29,9 +29,11 @@ void get_file(void);
 	// get_block	
 int get_empty_inode(void);
 
-int set_inode(int wrekd,int* new_inode);
+int set_inode(int i_num,int* new_inode);
 
 int add_inode(int* new_inode);
+
+int delete_inode(int i_num);
 
 // Global Variables //
 int** i_node_table=NULL; 
@@ -133,6 +135,12 @@ int add_inode(int* new_inode){
 	return temp_loc;
 }
 
+int delete_inode(int i_num){
+	for (int i=0;i<BLOCKS;i++){
+		i_node_table[i_num][i] = 0;
+	}
+	return 0;
+}
 /**
 *Structure of I_Node table will be:
 *BLOCK 2:
