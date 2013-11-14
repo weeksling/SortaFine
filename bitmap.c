@@ -15,12 +15,15 @@
 #define BITMAP_BUFF 512
 #define ROOT_DIR 11
 #define BITMAP_LOC 0
+#define CHECKSUM_LOC 1
 #define DISK_SIZE 512
 #define BLK_BUF_SIZE 128
+
 
 int release_allblocks_fromfile(void);
 int release_block(int blk_num);
 int get_empty_blk(int* freeblk);
+int init_super_block(void);
 int get_super_blk(void);
 int put_super_blk(void);
 
@@ -33,6 +36,7 @@ char* buff = NULL;
   * Set all entries of disk_bitmap to 0, marking them as free
   * @return 0 	if successful, -1 otherwise
   */
+
 int release_allblocks_fromfile(void){
 	// release_block
 	if (disk_bitmap == NULL) {
@@ -57,6 +61,13 @@ int release_block(int blk_num){
 		return -1;
 	}
 	disk_bitmap[blk_num] = 0;
+	return put_super_blk();
+}
+
+int init_super_block(){
+	super_blk_buf=(shortint*) calloc(BLK_BUF_SIZE, sizeof(int));
+	disk_bitmap=(int*) calloc(DISK_SIZE, sizeof(int));
+	int error_check=get_super_blk();
 	return 0;
 }
 
@@ -93,26 +104,36 @@ int get_super_blk(void){
 	int bitmap_pos = 0;
 	int current = 0;
 	int length = sizeof(super_blk_buf)/sizeof(short int);
+	int result = get_block(BITMAP_LOC, buff);
+	int* checksum=NULL
+	int error_check = get_block(CHECKSUM_LOC,checksum);
+	super_blk_buf = (short int*) buff;
 
-		int result = get_block(BITMAP_LOC, buff);
-		super_blk_buf = (short int*) buff;
-		
-		if (result < 0) {
-			return -1;
-		}
+	if (result < 0) {
+		return -1;
+	}
 
-		for(int i=0; i<length; i++) {
-			current = super_blk_buf[i];
-			for(int j=3; j>=0; j--) {
-				if (current >= pow(2,j)) {
-					disk_bitmap[bitmap_pos] = 1;
-					current = current - pow(2,j);
-				} else {
-					disk_bitmap[bitmap_pos] = 0;
-				}
-				bitmap_pos++;
+	for(int i=0; i<length; i++) {
+		current = super_blk_buf[i];
+		for(int j=3; j>=0; j--) {
+			if (current >= pow(2,j)) {
+				disk_bitmap[bitmap_pos] = 1;
+				current = current - pow(2,j);
+			} else {
+				disk_bitmap[bitmap_pos] = 0;
 			}
+			bitmap_pos++;
 		}
+	}
+
+	for (int i=0; i<DISK_SIZE; i++){
+		check += buff[i];
+	}
+
+	if(checksum!=check || error_check<0){
+		return -1;
+	}
+
 	free(buff);
 	free(super_blk_buf);
 
@@ -151,9 +172,7 @@ int put_super_blk(void){
 		if (result < 0) {
 			return -1;
 		}
-
 	}
 	free(buff);
-
 	return 0;
 }
