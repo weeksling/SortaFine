@@ -10,9 +10,13 @@
 #include "I_node.h"
 #include <stdio.h>
 #include <stdlib.h>
+
 #define BUFFER_SIZE 512
 #define BITMAP_BUFF 512
 #define ROOT_DIR 11
+#define BITMAP_LOC 0
+#define DISK_SIZE 512
+#define BLK_BUF_SIZE 128
 
 int release_allblocks_fromfile(void);
 int release_block(int blk_num);
@@ -31,14 +35,13 @@ char* buff = NULL;
   */
 int release_allblocks_fromfile(void){
 	// release_block
-	// put_inode_table
 	if (disk_bitmap == NULL) {
 		return -1;
 	}
-	int length = sizeof(disk_bitmap)/sizeof(int);
-	for (int i=0; i<length; i++) {
+	for (int i=0; i<DISK_SIZE; i++) {
 		disk_bitmap[i] = 0;
 	}
+	put_super_blk();
 	return 0;
 }
 
@@ -91,8 +94,7 @@ int get_super_blk(void){
 	int current = 0;
 	int length = sizeof(super_blk_buf)/sizeof(short int);
 
-	for(int a=0; a<=1; a++) {
-		int result = get_block(a, buff);
+		int result = get_block(BITMAP_LOC, buff);
 		super_blk_buf = (short int*) buff;
 		
 		if (result < 0) {
@@ -111,7 +113,6 @@ int get_super_blk(void){
 				bitmap_pos++;
 			}
 		}
-	}
 	free(buff);
 	free(super_blk_buf);
 
@@ -153,7 +154,6 @@ int put_super_blk(void){
 
 	}
 	free(buff);
-	free(super_blk_buf);
 
 	return 0;
 }

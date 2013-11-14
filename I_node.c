@@ -19,6 +19,8 @@ int set_file_pointer(int i_number, int* file_ptr);
 	// put_block
 int get_file_pointer(int i_number, int* file_ptr);
 	// get_block
+int put_file_pointer();
+	//put_block
 int get_inode_table(int** table);
 	// get_block
 int put_inode_table(void);
@@ -39,17 +41,27 @@ int** file_pointer=NULL;
 }*/
 
 int inode_initialize(int erase){
-	//#ifndef INITIALIZED
-	if(erase == 0){
-		buffer=(char*)calloc(BUFFER_SIZE, sizeof(char));
-		file_pointer=(int**)calloc(COMPONENTS, sizeof(int*));
-		i_node_table=(int**)calloc (BLOCKS, COMPONENTS*sizeof(int));
+	//#ifndef 
+	buffer=(char*)calloc(BUFFER_SIZE, sizeof(char));
+	file_pointer=(int**)calloc(COMPONENTS, sizeof(int*));
+	i_node_table=(int**)calloc (BLOCKS, COMPONENTS*sizeof(int));
+	if(erase == 1){
+		for (int block=0; block<BLOCKS; block++)
+			for (int comp=0; comp<COMPONENTS; comp++)
+				i_node_table[block][comp]=0;
+		put_inode_table();
+		for (int file=0;file<COMPONENTS;file++)
+			set_file_pointer(file, 0);
 	}
+	get_inode_table(i_node_table);
+	for (int comp=0; comp<COMPONENTS;comp++)
+		get_file_pointer(comp, file_pointer[comp]);
 	return 0;
 }
 
 int set_file_pointer(int i_number, int* file_ptr){
-	put_block(FILE_POINTER+i_number, (char*)file_ptr);
+	file_pointer[i_number]=file_ptr;
+	put_file_pointer();
 	return 0;
 }
 
@@ -58,8 +70,13 @@ int get_file_pointer(int i_number, int* file_ptr){
 	// file_pointer is the 10th block
 	get_block(FILE_POINTER, (char*)buffer);
 	int** temp = (int**) buffer;
-	file_ptr = temp[i_number];
+	file_ptr = (int*)temp[i_number];
 	free(temp);
+	return 0;
+}
+
+int put_file_pointer(){
+	put_block(FILE_POINTER, (char*)file_pointer);
 	return 0;
 }
 
@@ -72,9 +89,16 @@ int get_inode_table(int** table){
 	return 0;
 }
 
+int get_inode(int i_num, int* table){
+	for (int node=0; node<BLOCKS; node++){
+		table[node]=i_node_table[i_num][node];
+	}
+	return 0;
+}
+
 int put_inode_table(){
 	for (int file=0; file<BLOCKS; file++){
-		strcpy(buffer,(char*)i_node_table);
+		strcpy(buffer,(char*)i_node_table[file]);
 		put_block(I_NODE_START+file, buffer);
 	}
 	return 0;

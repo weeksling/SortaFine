@@ -8,15 +8,15 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <stdio.h>
-//<<<<<<< Updated upstream
+
+
 #define BLOCK_SIZE 128
 #define BUFFER_SIZE 512
 
-//=======
 #define BLOCKS 8
 #define COMPONENTS 64
 #define DATA_START 11
-//>>>>>>> Stashed changes
+
 int error_check = 0;
 char* sfs_buff = NULL;
 int* count = NULL;
@@ -51,7 +51,7 @@ void sfs_read(int fd, int start, int length, char* mem_pointer){
         }
 
         get_file_pointer(i_number, size);
-        //get_inode = (i_number, i_node);
+        get_inode(i_number, i_node);
 
         while(start > BLOCK_SIZE) {
                 start = start - BLOCK_SIZE;
@@ -93,7 +93,7 @@ void sfs_open(char* pathname){
 	}
 	int length = sizeof(pathname)/sizeof(char);
 	pntStr+=length;
-	char* pntEnd = strstr(sfs_buff, "\n");
+	char* pntEnd = strstr(pntStr, "\n");
 	char* store = calloc(1,sizeof(sfs_buff));
 	strncpy(store, pntStr, pntEnd-pntStr);
 	int* loc = (int*) store;
@@ -113,9 +113,6 @@ void sfs_open(char* pathname){
 	if(error_check==-1){
 		printf("There was a problem setting reference count\n");
 	}
-	///////////////////////////////////////////////////////////
-	//set_fd();
-	///////////////////////////////////////////////////////////
 }
 	/*	get_reference_count
 		get_inode_table
@@ -126,18 +123,10 @@ void sfs_open(char* pathname){
 		set_fd*/
 void sfs_close(int fd){
 	////////////////////////////////////////////////////
-	get_fd(fd);
-	////////////////////////////////////////////////////
-	error_check = get_reference_count(fd, count);
-	if(error_check==-1){
-		printf("There was a problem getting refrence count.\n");
+	error_check = close_fd(fd);
+	if (error_check<0){
+		printf("There is not file %d open currently\n",fd);
 	}
-	error_check = set_reference_count(fd, *count-1);
-	if(error_check==-1){
-		printf("There was a problem setting reference count\n");
-	}
-	////////////////////////////////////////////////////
-	close_fd(fd);
 	////////////////////////////////////////////////////
 }
 	/*	get_fd
@@ -165,13 +154,15 @@ void sfs_delete(char* pathname){
 		set_file_pointer
 		release_allblocks_fromfiles
 		put_file*/
-void sfs_initilize(int erase){
-	int** i_node_buff=(int**)calloc(BLOCKS, COMPONENTS*sizeof(int));
+void sfs_initialize(int erase){
+	int* i_node_buff = calloc(BLOCKS, sizeof(int));
 	if(erase==1){
 		error_check=release_allblocks_fromfile();
 		if(error_check==-1){
-			printf("Error freeing memory.\n");
+			printf("Error freeing memory in disk_bitmap.\n");
 		}
+		error_check=inode_initialize(1);
+
 	}
 	error_check = get_super_blk();
 	if(error_check==-1){
@@ -180,14 +171,6 @@ void sfs_initilize(int erase){
 	error_check=put_super_blk();
 	if(error_check==-1){
 		printf("Error in putting super_blk back\n");
-	}
-	error_check = get_inode_table(i_node_buff);
-	if(error_check==-1){
-		printf("Error in geting inode table.\n");
-	}
-	error_check = put_inode_table();
-	if(error_check== -1){
-		printf("Error in putting the inode table.\n");
 	}
 	free(i_node_buff);
 //<<<<<<< Updated upstream
