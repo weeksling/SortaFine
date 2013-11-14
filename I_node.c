@@ -130,6 +130,7 @@ int add_inode(int* new_inode){
 		return -1;
 	}
 	i_node_table[temp_loc] = new_inode;
+	return temp_loc;
 }
 
 /**
