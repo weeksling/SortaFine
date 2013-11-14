@@ -208,11 +208,11 @@ void sfs_create(char* pathname){
 	int* location_blk;
 	int* sfs_size;
 	int number_i;
+	int current_position;
 	error_check = sfs_exists(pathname);
-	int current_pos;
 	if (error_check<0){
 		printf("Does not exist.\n");
-	});
+	}
 	error_check = get_empty_blk(location_blk);
 	if (error_check<0){
 		printf("No blocks free..\n");
@@ -244,7 +244,48 @@ void sfs_create(char* pathname){
 		get_empty_blk
 		put_inode_table*/
 void sfs_delete(char* pathname){
-
+	sfs_buff = calloc(BUFFER_SIZE, sizeof(char*));
+	int* sfs_size;
+	int* sfs_table;
+	char* newDir;
+	error_check = sfs_exists(pathname);
+	if (error_check<0){
+		printf("Does not exist.\n");
+	}
+	//check to open first
+	get_block(DATA_START, sfs_buff);
+	char* pntStr = strstr(sfs_buff, pathname);
+	if(pntStr == NULL){
+		printf("FILE NOT FOUND");
+		return;
+	}
+	int length = sizeof(pathname)/sizeof(char);
+	pntStr+=length;
+	char* pntEnd = strstr(pntStr, "\n");
+	char* store = calloc(1,sizeof(sfs_buff));
+	strncpy(store, pntStr, pntEnd-pntStr);
+	int loc = (int) store;
+	error_check = get_inode(loc, sfs_table);
+	for(int i=0; i<8;i++){
+		if(sfs_table[i]!=0){
+			error_check = release_block(sfs_table[i]);
+		}
+	}	
+	delete_inode(loc);
+	int temp_star = pntStr - sfs_buff;
+	int temp_fin = pntEnd - sfs_buff;
+	error_check = get_file_pointer(0,sfs_size);
+	if (error_check<0){
+		printf("Error.\n");
+	}
+	strncpy(newDir, sfs_buff, temp_star);
+	strcat(newDir, strEnd);
+	putBlock(11, newDir);
+	free(sfs_size);
+	free(sfs_table);
+	free(pntStr);
+	free(store);
+	free(pntEnd);
 }
 	/*	get_inode_table
 		get_file_pointer
