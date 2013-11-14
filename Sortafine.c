@@ -42,7 +42,6 @@ void sfs_read(int fd, int start, int length, char* mem_pointer){
         int* i_node = NULL;
         int to_read = 0;
         int current;
-        int buff_length=0; // WUT??? this never got defined... like ever... dude... I'm so high.. this is fun. kk bai put a sloth
         int position = 0;
         sfs_buff = calloc(BUFFER_SIZE, sizeof(char*));
 
@@ -53,28 +52,99 @@ void sfs_read(int fd, int start, int length, char* mem_pointer){
         get_file_pointer(i_number, size);
         get_inode(i_number, i_node);
 
-        while(start > BLOCK_SIZE) {
-                start = start - BLOCK_SIZE;
-                to_read++;
-        }
+        if (start < BLOCK_SIZE) {
+       		 to_read = 0;
+    	} else if (start < 2*BLOCK_SIZE) {
+        	to_read = 1;
+    	} else if (start < 3*BLOCK_SIZE) {
+        	to_read = 2;
+    	} else if (start < 4*BLOCK_SIZE) {
+    	    to_read = 3;
+    	} else if (start < 5*BLOCK_SIZE) {
+    		to_read = 4;
+    	} else if (start < 6*BLOCK_SIZE) {
+    		to_read = 5;
+    	} else if (start < 7*BLOCK_SIZE) {
+    		to_read = 6;
+    	} else if (start < 8*BLOCK_SIZE) {
+    		to_read = 7;
+    	}
 
         do {
-                current = start;
-                get_block(i_node[to_read], sfs_buff);
-                length = sizeof(sfs_buff)/sizeof(char*);
-                while(current <= start+length || current <= buff_length) {
-                        mem_pointer[position] = sfs_buff[current];
-                        current++;
-                        position++;
-                }
-                start = 0;
+            current = start;
+            get_block(i_node[to_read], sfs_buff);
+            while(current <= start+length || current <= BLOCK_SIZE) {
+                mem_pointer[position] = sfs_buff[current];
+                current++;
+                position++;
+            }
+            start = 0;
+            to_read++;
         } while(position <= length);
+
+        free(sys_buff);
+    	free(i_node);
+    	free(size);
 }
 	/*	get_inode_table
 		get_fd
 		get_file
 		get_file_pointer*/
 void sfs_write(int fd, int start, int length, char* mem_pointer){
+	int i_number = get_fd(fd);
+	int* i_node = NULL:
+	int to_read;
+	int* size = NULL;
+	int current = 0;
+	int position = 0;
+	sys_buff = calloc(BUFFER_SIZE, sizeof(char*));
+
+	if (i_number < 0) {
+		return;
+	}
+
+	get_inode(i_number, i_node);
+	get_file_pointer(i_number, size);
+
+	if (start < 0) {
+		to_read = size / BLOCK_SIZE;
+	} else if (start < BLOCK_SIZE) {
+        to_read = 0;
+    } else if (start < 2*BLOCK_SIZE) {
+        to_read = 1;
+    } else if (start < 3*BLOCK_SIZE) {
+        to_read = 2;
+    } else if (start < 4*BLOCK_SIZE) {
+        to_read = 3;
+    } else if (start < 5*BLOCK_SIZE) {
+    	to_read = 4;
+    } else if (start < 6*BLOCK_SIZE) {
+    	to_read = 5;
+    } else if (start < 7*BLOCK_SIZE) {
+    	to_read = 6;
+    } else if (start < 8*BLOCK_SIZE) {
+    	to_read = 7;
+    }
+
+    do {
+    	get_block(i_node[to_read], sys_buff);
+    	if (start > 0) {
+    		current = start; 
+    	} else {
+    		current = size % BLOCK_SIZE +1;
+    	}
+    	while(current <= start+length || current <= BLOCK_SIZE) {
+    		sfs_buff[current] = mem_pointer[position];
+    		current++;
+    		position++;
+    	}
+    	start = 0;
+    	to_read++;
+    } while(position <= length);
+
+    free(sys_buff);
+    free(i_node);
+    free(size);
 
 }
 	/*	get_file_pointer
