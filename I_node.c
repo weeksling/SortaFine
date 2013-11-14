@@ -112,7 +112,7 @@ int put_inode_table(){
 }
 
 int get_empty_inode(){
-        for(int e = 0; e <COMPONENTS; e++)
+        for(int e = 1; e <COMPONENTS; e++)
         {        
         	if(i_node_table[e][0]==0){
         		return e;

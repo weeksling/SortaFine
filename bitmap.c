@@ -97,13 +97,12 @@ int get_empty_blk(int* freeblk){
   * @return 0 	if successful, -1 otherwise
   */
 int get_super_blk(void){
-	//super_blk_buf = (short int*) calloc(BUFFER, sizeof(short int));
+	super_blk_buf = (short int*) calloc(DISK_SIZE, sizeof(short int));
 	disk_bitmap = (int*) calloc(BITMAP_BUFF, sizeof(int));
 	buff = (char*) calloc(BUFFER_SIZE, sizeof(char));
 
 	int bitmap_pos = 0;
 	int current = 0;
-	int length = sizeof(super_blk_buf)/sizeof(short int);
 	int result = get_block(BITMAP_LOC, buff);
 	int* checksum=NULL
 	int error_check = get_block(CHECKSUM_LOC,checksum);
@@ -113,7 +112,7 @@ int get_super_blk(void){
 		return -1;
 	}
 
-	for(int i=0; i<length; i++) {
+	for(int i=0; i<DISK_SIZE; i++) {
 		current = super_blk_buf[i];
 		for(int j=3; j>=0; j--) {
 			if (current >= pow(2,j)) {
@@ -155,24 +154,32 @@ int put_super_blk(void){
 	int length = sizeof(super_blk_buf)/sizeof(short int);
 	int toWrite = 0;
 
-	for (int a=0; a<=1; a++) {
-
-		for(int i=0; i<length; i++) {
-			toWrite = 0;
-			for(int j=3; j>=0; j--) {
-				if(disk_bitmap[bitmap_pos] == 1) {
-					toWrite = toWrite + pow(2,j);
-				}
-				bitmap_pos++;
+	for(int i=0; i<; i++) {
+		toWrite = 0;
+		for(int j=3; j>=0; j--) {
+			if(disk_bitmap[bitmap_pos] == 1) {
+				toWrite = toWrite + pow(2,j);
 			}
-			super_blk_buf[i] = toWrite;
+			bitmap_pos++;
 		}
-		buff = (char*) super_blk_buf;
-		int result = put_block(a, buff);
-		if (result < 0) {
-			return -1;
-		}
+		super_blk_buf[i] = toWrite;
 	}
+	buff = (char*) super_blk_buf;
+
+	int check=0;
+	for (int i=0; i<DISK_SIZE; i++){
+		check += disk_bitmap[i];
+	}
+
+	int error_check = put_block(CHECKSUM_LOC, check);
+	int result = put_block(BITMAP_LOC, buff);
+	
+	if (result < 0 || error_check<0) {
+		return -1;
+	}
+
+
+	int check 
 	free(buff);
 	return 0;
 }

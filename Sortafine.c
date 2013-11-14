@@ -28,6 +28,7 @@ void sfs_close(int fd);
 void sfs_create(char* pathname);
 void sfs_delete(char* pathname);
 void sfs_initilize(int erase);
+int sfs_exists (char* pathname);
 
 
 int main (void){
@@ -82,7 +83,7 @@ void sfs_read(int fd, int start, int length, char* mem_pointer){
             to_read++;
         } while(position <= length);
 
-        free(sys_buff);
+        free(sfs_buff);
     	free(i_node);
     	free(size);
 }
@@ -92,12 +93,12 @@ void sfs_read(int fd, int start, int length, char* mem_pointer){
 		get_file_pointer*/
 void sfs_write(int fd, int start, int length, char* mem_pointer){
 	int i_number = get_fd(fd);
-	int* i_node = NULL:
+	int* i_node = NULL;
 	int to_read;
 	int* size = NULL;
 	int current = 0;
 	int position = 0;
-	sys_buff = calloc(BUFFER_SIZE, sizeof(char*));
+	sfs_buff = calloc(BUFFER_SIZE, sizeof(char*));
 
 	if (i_number < 0) {
 		return;
@@ -107,7 +108,7 @@ void sfs_write(int fd, int start, int length, char* mem_pointer){
 	get_file_pointer(i_number, size);
 
 	if (start < 0) {
-		to_read = size / BLOCK_SIZE;
+		to_read = *size / BLOCK_SIZE;
 	} else if (start < BLOCK_SIZE) {
         to_read = 0;
     } else if (start < 2*BLOCK_SIZE) {
@@ -127,11 +128,11 @@ void sfs_write(int fd, int start, int length, char* mem_pointer){
     }
 
     do {
-    	get_block(i_node[to_read], sys_buff);
+    	get_block(i_node[to_read], sfs_buff);
     	if (start > 0) {
     		current = start; 
     	} else {
-    		current = size % BLOCK_SIZE +1;
+    		current = *size % BLOCK_SIZE +1;
     	}
     	while(current <= start+length || current <= BLOCK_SIZE) {
     		sfs_buff[current] = mem_pointer[position];
@@ -142,7 +143,7 @@ void sfs_write(int fd, int start, int length, char* mem_pointer){
     	to_read++;
     } while(position <= length);
 
-    free(sys_buff);
+    free(sfs_buff);
     free(i_node);
     free(size);
 
@@ -204,7 +205,7 @@ void sfs_close(int fd){
 		set_fd
 		set_reference_count*/
 void sfs_create(char* pathname){
-	sys_buff = calloc(BUFFER_SIZE, sizeof(char*));
+	sfs_buff = calloc(BUFFER_SIZE, sizeof(char*));
 	int* location_blk;
 	int* sfs_size;
 	int number_i;
@@ -317,7 +318,7 @@ void sfs_initialize(int erase){
 //<<<<<<< Updated upstream
 }
 
-int sfs_exist(char* pathname){
+int sfs_exists(char* pathname){
 	get_block(11, sfs_buff);
 	char* pntStr = strstr(sfs_buff, pathname);
 	if(pntStr == NULL){
