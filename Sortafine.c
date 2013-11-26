@@ -206,6 +206,7 @@ int sfs_close(int fd){
 	if (error_check<0){
 		printf("There is not file %d open currently\n",fd);
 	}
+	return 0;
 	////////////////////////////////////////////////////
 }
 	/*	get_fd
