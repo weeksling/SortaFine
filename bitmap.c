@@ -68,6 +68,8 @@ int init_super_block(){
 	super_blk_buf=(short int*) calloc(BLK_BUF_SIZE, sizeof(int));
 	disk_bitmap=(int*) calloc(DISK_SIZE, sizeof(int));
 	int error_check=get_super_blk();
+	if (error_check<0)
+		return -1;
 	return 0;
 }
 
@@ -95,19 +97,26 @@ int get_empty_blk(int* freeblk){
 /** 
   * Reads superblock from disk and initializes disk_bitmap
   * @return 0 	if successful, -1 otherwise
+  * @Contributors Matthew Weeks
   */
 int get_super_blk(void){
 	super_blk_buf = (short int*) calloc(DISK_SIZE, sizeof(short int));
 	disk_bitmap = (int*) calloc(BITMAP_BUFF, sizeof(int));
 	buff = (char*) calloc(BUFFER_SIZE, sizeof(char));
 
+	/* Check that disk is not corrupted */
+	int check=0;
+	if (*buff!=check){
+		printf("Checksum authentication failed!");
+		return -1;
+	}
+
+	/* Get bitmap from disk */
 	int bitmap_pos = 0;
 	int current = 0;
 	int result = get_block(BITMAP_LOC, buff);
-	int* checksum=NULL;
-	int error_check = get_block(CHECKSUM_LOC,checksum);
+	int error_check = get_block(CHECKSUM_LOC,buff);
 	super_blk_buf = (short int*) buff;
-
 	if (result < 0) {
 		return -1;
 	}
@@ -124,12 +133,11 @@ int get_super_blk(void){
 			bitmap_pos++;
 		}
 	}
-	int check=0;
 	for (int i=0; i<DISK_SIZE; i++){
 		check += buff[i];
 	}
 
-	if(checksum!=check || error_check<0){
+	if(error_check<0){
 		return -1;
 	}
 
@@ -151,7 +159,6 @@ int put_super_blk(void){
 	buff = (char*) calloc(BUFFER_SIZE, sizeof(char));
 
 	int bitmap_pos = 0;
-	int length = sizeof(super_blk_buf)/sizeof(short int);
 	int toWrite = 0;
 
 	for(int i=0; i<BLK_BUF_SIZE; i++) {
@@ -171,7 +178,8 @@ int put_super_blk(void){
 		check += disk_bitmap[i];
 	}
 
-	int error_check = put_block(CHECKSUM_LOC, check);
+	sprintf(buff,"%d",check);
+	int error_check = put_block(CHECKSUM_LOC, buff);
 	int result = put_block(BITMAP_LOC, buff);
 
 	if (result < 0 || error_check<0) {

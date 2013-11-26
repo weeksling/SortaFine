@@ -106,7 +106,7 @@ int p1,p2,p3;
    main test routine
 ******************************************************/
 
-main()
+int main()
 {
   int i;
   int retval;  /* used to hold return values of file system calls */

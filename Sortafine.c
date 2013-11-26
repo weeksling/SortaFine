@@ -21,13 +21,13 @@ int error_check = 0;
 char* sfs_buff = NULL;
 int* count = NULL;
 
-void sfs_read(int fd, int start, int length, char* mem_pointer);
-void sfs_write(int fd, int start, int length, char* mem_pointer);
-void sfs_open(char* pathname);
-void sfs_close(int fd);
-void sfs_create(char* pathname);
-void sfs_delete(char* pathname);
-void sfs_initilize(int erase);
+int sfs_read(int fd, int start, int length, char* mem_pointer);
+int sfs_write(int fd, int start, int length, char* mem_pointer);
+int sfs_open(char* pathname);
+int sfs_close(int fd);
+int sfs_create(char* pathname, int type);
+int sfs_delete(char* pathname);
+int sfs_initilize(int erase);
 int sfs_exists (char* pathname);
 
 
@@ -35,7 +35,7 @@ int main (void){
 	return 0;
 }
 
-void sfs_read(int fd, int start, int length, char* mem_pointer){
+int sfs_read(int fd, int start, int length, char* mem_pointer){
 //Make sure the fetching is correct
         int i_number = get_fd(fd);
         //int* node_buff = NULL;
@@ -47,7 +47,7 @@ void sfs_read(int fd, int start, int length, char* mem_pointer){
         sfs_buff = calloc(BUFFER_SIZE, sizeof(char*));
 
         if (i_number < 0) {
-                return;
+                return -1;
         }
 
         get_file_pointer(i_number, size);
@@ -73,7 +73,9 @@ void sfs_read(int fd, int start, int length, char* mem_pointer){
 
         do {
             current = start;
-            get_block(i_node[to_read], sfs_buff);
+            error_check=get_block(i_node[to_read], sfs_buff);
+            if (error_check<0)
+            	return -1;
             while(current <= start+length || current <= BLOCK_SIZE) {
                 mem_pointer[position] = sfs_buff[current];
                 current++;
@@ -86,12 +88,13 @@ void sfs_read(int fd, int start, int length, char* mem_pointer){
         free(sfs_buff);
     	free(i_node);
     	free(size);
+    	return 1;
 }
 	/*	get_inode_table
 		get_fd
 		get_file
 		get_file_pointer*/
-void sfs_write(int fd, int start, int length, char* mem_pointer){
+int sfs_write(int fd, int start, int length, char* mem_pointer){
 	int i_number = get_fd(fd);
 	int* i_node = NULL;
 	int to_read;
@@ -101,7 +104,7 @@ void sfs_write(int fd, int start, int length, char* mem_pointer){
 	sfs_buff = calloc(BUFFER_SIZE, sizeof(char*));
 
 	if (i_number < 0) {
-		return;
+		return -1;
 	}
 
 	get_inode(i_number, i_node);
@@ -128,7 +131,9 @@ void sfs_write(int fd, int start, int length, char* mem_pointer){
     }
 
     do {
-    	get_block(i_node[to_read], sfs_buff);
+    	error_check=get_block(i_node[to_read], sfs_buff);
+    	if(error_check<0)
+    		return -1;
     	if (start > 0) {
     		current = start; 
     	} else {
@@ -146,7 +151,7 @@ void sfs_write(int fd, int start, int length, char* mem_pointer){
     free(sfs_buff);
     free(i_node);
     free(size);
-
+    return 1;
 }
 	/*	get_file_pointer
 		get_inode_table
@@ -154,13 +159,13 @@ void sfs_write(int fd, int start, int length, char* mem_pointer){
 		get_file
 		set_file_pointer
 		put_file*/
-void sfs_open(char* pathname){
+int sfs_open(char* pathname){
 
 	get_block(DATA_START, sfs_buff);
 	char* pntStr = strstr(sfs_buff, pathname);
 	if(pntStr == NULL){
 		printf("FILE NOT FOUND");
-		return;
+		return -1;
 	}
 	int length = sizeof(pathname)/sizeof(char);
 	pntStr+=length;
@@ -172,18 +177,21 @@ void sfs_open(char* pathname){
 	int fd = set_fd(*loc);
 	if (fd < 0){
 		printf("Could not open file!");
-		return;
+		return -1;
 	}
 	///////////////////////////////////////////////////////////
 	
 	error_check = get_reference_count(fd, count);
-	if(error_check==-1){
+	if(error_check<0){
 		printf("There was a problem getting refrence count.\n");
+		return -1;
 	}
 	error_check = set_reference_count(fd, *count+1);
-	if(error_check==-1){
+	if(error_check<0){
 		printf("There was a problem setting reference count\n");
+		return -1;
 	}
+	return 1;
 }
 	/*	get_reference_count
 		get_inode_table
@@ -192,7 +200,7 @@ void sfs_open(char* pathname){
 		get_file
 		set_reference_count
 		set_fd*/
-void sfs_close(int fd){
+int sfs_close(int fd){
 	////////////////////////////////////////////////////
 	error_check = close_fd(fd);
 	if (error_check<0){
@@ -204,37 +212,40 @@ void sfs_close(int fd){
 		get_reference_count
 		set_fd
 		set_reference_count*/
-void sfs_create(char* pathname){
+int sfs_create(char* pathname, int type){
 	sfs_buff = calloc(BUFFER_SIZE, sizeof(char*));
 	int* location_blk;
 	int* sfs_size;
-	int number_i;
-	int current_position;
+	int i_number;
 	error_check = sfs_exists(pathname);
 	if (error_check<0){
 		printf("Does not exist.\n");
+		return -1;
 	}
 	error_check = get_empty_blk(location_blk);
 	if (error_check<0){
 		printf("No blocks free..\n");
+		return -1;
 	}
-	number_i = add_inode(location_blk);
+	i_number = add_inode(location_blk);
 	error_check = get_file_pointer(0,sfs_size);
 	if (error_check<0){
 		printf("Error.\n");
+		return -1;
 	}
 	error_check = get_block(DATA_START, sfs_buff);
 	if (error_check<0){
 		printf("Error.\n");
+		return -1;
 	}
-	current_position = *sfs_size+1;
 	strcat(sfs_buff,pathname);
 	strcat(sfs_buff," ");
-	strcat(sfs_buff,(char*)number_i);
+	sprintf(sfs_buff+strlen(sfs_buff),"%d",i_number);
 	strcat(sfs_buff,"\n");
 	free(sfs_buff);
 	free(sfs_size);
 	free(location_blk);
+	return 1;
 }
 	/*	get_inode_table
 		compare_component_tobuff
@@ -243,7 +254,7 @@ void sfs_create(char* pathname){
 		set_file_pointer
 		get_empty_blk
 		put_inode_table*/
-void sfs_delete(char* pathname){
+int sfs_delete(char* pathname){
 	sfs_buff = calloc(BUFFER_SIZE, sizeof(char*));
 	int* sfs_size;
 	int* sfs_table;
@@ -251,13 +262,14 @@ void sfs_delete(char* pathname){
 	error_check = sfs_exists(pathname);
 	if (error_check<0){
 		printf("Does not exist.\n");
+		return -1;
 	}
 	//check to open first
 	get_block(DATA_START, sfs_buff);
 	char* pntStr = strstr(sfs_buff, pathname);
 	if(pntStr == NULL){
 		printf("FILE NOT FOUND");
-		return;
+		return -1;
 	}
 	int length = sizeof(pathname)/sizeof(char);
 	pntStr+=length;
@@ -269,6 +281,8 @@ void sfs_delete(char* pathname){
 	for(int i=0; i<8;i++){
 		if(sfs_table[i]!=0){
 			error_check = release_block(sfs_table[i]);
+			if(error_check<0)
+				return -1;
 		}
 	}	
 	delete_inode(loc);
@@ -277,6 +291,7 @@ void sfs_delete(char* pathname){
 	error_check = get_file_pointer(0,sfs_size);
 	if (error_check<0){
 		printf("Error.\n");
+		return -1;
 	}
 	strncpy(newDir, sfs_buff, temp_star);
 	strcat(newDir, pntEnd);
@@ -286,6 +301,7 @@ void sfs_delete(char* pathname){
 	free(pntStr);
 	free(store);
 	free(pntEnd);
+	return 1;
 }
 	/*	get_inode_table
 		get_file_pointer
@@ -295,26 +311,32 @@ void sfs_delete(char* pathname){
 		set_file_pointer
 		release_allblocks_fromfiles
 		put_file*/
-void sfs_initialize(int erase){
+int sfs_initialize(int erase){
 	int* i_node_buff = calloc(BLOCKS, sizeof(int));
 	if(erase==1){
 		error_check=release_allblocks_fromfile();
 		if(error_check==-1){
 			printf("Error freeing memory in disk_bitmap.\n");
+			return -1;
 		}
 		error_check=inode_initialize(1);
-
+		if(error_check==-1){
+			printf("Error initializing inode.\n");
+			return -1;
+		}
 	}
 	error_check = get_super_blk();
-	if(error_check==-1){
+	if(error_check<0){
 		printf("Error in get super blk\n");
+		return -1;
 	}
 	error_check=put_super_blk();
-	if(error_check==-1){
+	if(error_check<0){
 		printf("Error in putting super_blk back\n");
+		return -1;
 	}
 	free(i_node_buff);
-//<<<<<<< Updated upstream
+	return 1;
 }
 
 int sfs_exists(char* pathname){
