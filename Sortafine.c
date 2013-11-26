@@ -277,7 +277,7 @@ int sfs_delete(char* pathname){
 	char* pntEnd = strstr(pntStr, "\n");
 	char* store = calloc(1,sizeof(sfs_buff));
 	strncpy(store, pntStr, pntEnd-pntStr);
-	int loc = (int) store;
+	int loc = (int) *store;
 	error_check = get_inode(loc, sfs_table);
 	for(int i=0; i<8;i++){
 		if(sfs_table[i]!=0){
@@ -349,8 +349,6 @@ int sfs_exists(char* pathname){
 		return 1;
 	}
 	return -1;
-//=======
-//>>>>>>> Stashed changes
 }
 	/*	get_inode_table
 		get_super_blk
