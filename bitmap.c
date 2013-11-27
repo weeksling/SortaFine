@@ -22,7 +22,7 @@
 
 int release_allblocks_fromfile(void);
 int release_block(int blk_num);
-int get_empty_blk(int* freeblk);
+int get_empty_blk(void);
 int init_super_block(void);
 int get_super_blk(void);
 int put_super_blk(void);
@@ -78,20 +78,18 @@ int init_super_block(){
   * @param freeblk 	pointer to integer where free block is stored in once it is found
   * @return 0 		if successful, -1 otherwise
   */
-int get_empty_blk(int* freeblk){
-	for(int e = 11; e < BITMAP_BUFF; e++)
+int get_empty_blk(void){
+	for(int e = ROOT_DIR; e < BITMAP_BUFF; e++)
 	{	
 		if(disk_bitmap == NULL){
 			return -1;
 		}
 		if(disk_bitmap[e] == 0){
-			get_file_pointer(e, freeblk);
-			return 1;
-			break;
+			disk_bitmap[e]=1;
+			return e;
 		}
-		return -1;
 	}
-	return 0;
+	return -1;
 }
 
 /** 

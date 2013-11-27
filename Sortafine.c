@@ -16,6 +16,7 @@
 #define BLOCKS 8
 #define COMPONENTS 64
 #define DATA_START 11
+#define INODE_SIZE 8
 
 int error_check = 0;
 char* sfs_buff = NULL;
@@ -215,37 +216,37 @@ int sfs_close(int fd){
 		set_reference_count*/
 int sfs_create(char* pathname, int type){
 	sfs_buff = calloc(BUFFER_SIZE, sizeof(char*));
-	int* location_blk;
-	int* sfs_size;
+	int blk_loc;
 	int i_number;
+	int* i_node=calloc(INODE_SIZE,sizeof(int));
 	error_check = sfs_exists(pathname);
-	if (error_check<0){
-		printf("Does not exist.\n");
+	if (!error_check<0){
+		printf("Already Exists.\n");
 		return -1;
 	}
-	error_check = get_empty_blk(location_blk);
+	blk_loc = get_empty_blk();
 	if (error_check<0){
-		printf("No blocks free..\n");
+		printf("Error. No blocks free.\n");
 		return -1;
 	}
-	i_number = add_inode(location_blk);
-	error_check = get_file_pointer(0,sfs_size);
-	if (error_check<0){
-		printf("Error.\n");
+	i_node[0]=type;
+	i_node[1]=blk_loc;
+	i_number = add_inode(i_node);
+	if (i_number<0){
+		printf("Error. I_node Table full.\n");
 		return -1;
 	}
 	error_check = get_block(DATA_START, sfs_buff);
 	if (error_check<0){
-		printf("Error.\n");
+		printf("Error\n");
 		return -1;
 	}
 	strcat(sfs_buff,pathname);
 	strcat(sfs_buff," ");
 	sprintf(sfs_buff+strlen(sfs_buff),"%d",i_number);
 	strcat(sfs_buff,"\n");
+	put_block(DATA_START,sfs_buff);
 	free(sfs_buff);
-	free(sfs_size);
-	free(location_blk);
 	return 1;
 }
 	/*	get_inode_table
@@ -256,10 +257,12 @@ int sfs_create(char* pathname, int type){
 		get_empty_blk
 		put_inode_table*/
 int sfs_delete(char* pathname){
-	sfs_buff = calloc(BUFFER_SIZE, sizeof(char*));
-	int* sfs_size;
-	int* sfs_table;
-	char* newDir;
+
+	sfs_buff = calloc(BUFFER_SIZE, sizeof(char));
+	int sfs_size=0;
+	int* inode=calloc(INODE_SIZE, sizeof(int));
+	char* newDir=calloc(BUFFER_SIZE, sizeof(char));
+	//check if file exists
 	error_check = sfs_exists(pathname);
 	if (error_check<0){
 		printf("Does not exist.\n");
@@ -278,27 +281,25 @@ int sfs_delete(char* pathname){
 	char* store = calloc(1,sizeof(sfs_buff));
 	strncpy(store, pntStr, pntEnd-pntStr);
 	int loc = (int) *store;
-	error_check = get_inode(loc, sfs_table);
+	error_check = get_inode(loc, inode);
 	for(int i=0; i<8;i++){
-		if(sfs_table[i]!=0){
-			error_check = release_block(sfs_table[i]);
+		if(inode[i]!=0){
+			error_check = release_block(inode[i]);
 			if(error_check<0)
 				return -1;
 		}
 	}	
 	delete_inode(loc);
-	int temp_star = pntStr - sfs_buff;
-	int temp_fin = pntEnd - sfs_buff;
-	error_check = get_file_pointer(0,sfs_size);
+	int temp_str = pntStr - sfs_buff;
+	error_check = get_file_pointer(0,&sfs_size);
 	if (error_check<0){
 		printf("Error.\n");
 		return -1;
 	}
-	strncpy(newDir, sfs_buff, temp_star);
+	strncpy(newDir, sfs_buff, temp_str);
 	strcat(newDir, pntEnd);
 	put_block(11, newDir);
-	free(sfs_size);
-	free(sfs_table);
+	free(inode);
 	free(pntStr);
 	free(store);
 	free(pntEnd);

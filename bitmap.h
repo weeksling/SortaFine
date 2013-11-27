@@ -8,7 +8,7 @@ extern int
 extern int
  release_block(int blk_num);
 extern int
- get_empty_blk(int* freeblk);
+ get_empty_blk(void);
 extern int
  get_super_blk(void);
 extern int
