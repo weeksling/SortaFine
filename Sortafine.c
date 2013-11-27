@@ -39,8 +39,8 @@ int sfs_read(int fd, int start, int length, char* mem_pointer){
 //Make sure the fetching is correct
         int i_number = get_fd(fd);
         //int* node_buff = NULL;
-        int* size = NULL; 
-        int* i_node = NULL;
+        int size = 0; 
+        int* i_node = calloc(INODE_SIZE, sizeof(int));
         int to_read = 0;
         int current;
         int position = 0;
@@ -50,7 +50,7 @@ int sfs_read(int fd, int start, int length, char* mem_pointer){
                 return -1;
         }
 
-        get_file_pointer(i_number, size);
+        get_file_pointer(i_number, &size);
         get_inode(i_number, i_node);
 
         if (start < BLOCK_SIZE) {
@@ -86,13 +86,59 @@ int sfs_read(int fd, int start, int length, char* mem_pointer){
         } while(position <= length);
 
         free(sfs_buff);
-    	free(i_node);
-    	free(size);
+        free(i_node);
     	return 1;
 }
 
-int sfs_readdir(int fd, char io_buff){
+int sfs_readdir(int fd, char* io_buff){
+	int i_number = get_fd(fd);
+    int size = 0; 
+    int* i_node = calloc(INODE_SIZE, sizeof(int));
+    int to_read = 0;
+    sfs_buff = calloc(BUFFER_SIZE, sizeof(char));
 
+    if (i_number < 0) {
+            return -1;
+    }
+
+    get_file_pointer(i_number, &size);
+    get_inode(i_number, i_node);
+
+    if (size < BLOCK_SIZE) {
+   		 to_read = 0;
+	} else if (size < 2*BLOCK_SIZE) {
+    	to_read = 1;
+	} else if (size < 3*BLOCK_SIZE) {
+    	to_read = 2;
+	} else if (size < 4*BLOCK_SIZE) {
+	    to_read = 3;
+	} else if (size < 5*BLOCK_SIZE) {
+		to_read = 4;
+	} else if (size < 6*BLOCK_SIZE) {
+		to_read = 5;
+	} else if (size < 7*BLOCK_SIZE) {
+		to_read = 6;
+	} else if (size < 8*BLOCK_SIZE) {
+		to_read = 7;
+	}
+	int current_block=1;
+	int current=0;
+	do{
+		int position = 0;
+		get_block(i_node[current_block],sfs_buff);
+		char* start=sfs_buff;
+		char* end=strstr(sfs_buff,"\n");
+		while(current<size && position<BLOCK_SIZE){
+			end=strstr(start,"\n");
+			io_buff=strncat(io_buff+strlen(io_buff),start,end-start);
+			position = end-sfs_buff;
+			current=current + end-start+1;
+			start=end+1;
+		}
+		current_block++;
+	} while(current_block-1<=to_read);
+	return 1;
+	free(i_node);
 }
 	/**
 	 *Blair Wiser
@@ -101,7 +147,7 @@ int sfs_write(int fd, int start, int length, char* mem_pointer){
 	int i_number = get_fd(fd);
 	int* i_node = NULL;
 	int to_read;
-	int* size = NULL;
+	int size = 0;
 	int current = 0;
 	int position = 0;
 	sfs_buff = calloc(BUFFER_SIZE, sizeof(char*));
@@ -111,10 +157,10 @@ int sfs_write(int fd, int start, int length, char* mem_pointer){
 	}
 
 	get_inode(i_number, i_node);
-	get_file_pointer(i_number, size);
+	get_file_pointer(i_number, &size);
 
 	if (start < 0) {
-		to_read = *size / BLOCK_SIZE;
+		to_read = size / BLOCK_SIZE;
 	} else if (start < BLOCK_SIZE) {
         to_read = 0;
     } else if (start < 2*BLOCK_SIZE) {
@@ -140,7 +186,7 @@ int sfs_write(int fd, int start, int length, char* mem_pointer){
     	if (start > 0) {
     		current = start; 
     	} else {
-    		current = *size % BLOCK_SIZE +1;
+    		current = size % BLOCK_SIZE +1;
     	}
     	while(current <= start+length || current <= BLOCK_SIZE) {
     		sfs_buff[current] = mem_pointer[position];
@@ -153,7 +199,6 @@ int sfs_write(int fd, int start, int length, char* mem_pointer){
 
     free(sfs_buff);
     free(i_node);
-    free(size);
     return 1;
 }
 	/**
