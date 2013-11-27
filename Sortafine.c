@@ -23,6 +23,7 @@ char* sfs_buff = NULL;
 int* count = NULL;
 
 int sfs_read(int fd, int start, int length, char* mem_pointer);
+int sfs_readdir(int fd, char* io_buff);
 int sfs_write(int fd, int start, int length, char* mem_pointer);
 int sfs_open(char* pathname);
 int sfs_close(int fd);
@@ -30,11 +31,9 @@ int sfs_create(char* pathname, int type);
 int sfs_delete(char* pathname);
 int sfs_initilize(int erase);
 int sfs_exists (char* pathname);
+int sfs_getsize(char* pathname);
+int sfs_gettype(char* pathname);
 
-
-int main (void){
-	return 0;
-}
 
 int sfs_read(int fd, int start, int length, char* mem_pointer){
 //Make sure the fetching is correct
@@ -91,10 +90,13 @@ int sfs_read(int fd, int start, int length, char* mem_pointer){
     	free(size);
     	return 1;
 }
-	/*	get_inode_table
-		get_fd
-		get_file
-		get_file_pointer*/
+
+int sfs_readdir(int fd, char io_buff){
+
+}
+	/**
+	 *Blair Wiser
+	 */
 int sfs_write(int fd, int start, int length, char* mem_pointer){
 	int i_number = get_fd(fd);
 	int* i_node = NULL;
@@ -154,12 +156,9 @@ int sfs_write(int fd, int start, int length, char* mem_pointer){
     free(size);
     return 1;
 }
-	/*	get_file_pointer
-		get_inode_table
-		get_fd
-		get_file
-		set_file_pointer
-		put_file*/
+	/**
+	 * Matthew Weeks
+	 */
 int sfs_open(char* pathname){
 
 	get_block(DATA_START, sfs_buff);
@@ -194,13 +193,10 @@ int sfs_open(char* pathname){
 	}
 	return 1;
 }
-	/*	get_reference_count
-		get_inode_table
-		compare_component_tobuff
-		get_file_pointer
-		get_file
-		set_reference_count
-		set_fd*/
+
+	/**
+	 *Blair Wiser
+	 */
 int sfs_close(int fd){
 	////////////////////////////////////////////////////
 	error_check = close_fd(fd);
@@ -210,10 +206,11 @@ int sfs_close(int fd){
 	return 0;
 	////////////////////////////////////////////////////
 }
-	/*	get_fd
-		get_reference_count
-		set_fd
-		set_reference_count*/
+	/**
+	 * Matthew Weeks
+	 * Adam Pacheco
+	 *
+	 */
 int sfs_create(char* pathname, int type){
 	sfs_buff = calloc(BUFFER_SIZE, sizeof(char*));
 	int blk_loc;
@@ -249,13 +246,10 @@ int sfs_create(char* pathname, int type){
 	free(sfs_buff);
 	return 1;
 }
-	/*	get_inode_table
-		compare_component_tobuff
-		get_file_pointer
-		get_file
-		set_file_pointer
-		get_empty_blk
-		put_inode_table*/
+	/**
+	 *Matthew Weeks
+	 *
+	 */
 int sfs_delete(char* pathname){
 
 	sfs_buff = calloc(BUFFER_SIZE, sizeof(char));
@@ -305,14 +299,10 @@ int sfs_delete(char* pathname){
 	free(pntEnd);
 	return 1;
 }
-	/*	get_inode_table
-		get_file_pointer
-		compare_component_tobuff
-		get_file
-		get_reference_count
-		set_file_pointer
-		release_allblocks_fromfiles
-		put_file*/
+
+	/**
+	 *Matthew Weeks
+	 */
 int sfs_initialize(int erase){
 	int* i_node_buff = calloc(BLOCKS, sizeof(int));
 	if(erase==1){
