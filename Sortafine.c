@@ -19,7 +19,7 @@
 #define INODE_SIZE 8
 
 int error_check = 0;
-char* sfs_buff = NULL;
+char* sfs_buff;
 int* count = NULL;
 
 int sfs_read(int fd, int start, int length, char* mem_pointer);
@@ -257,7 +257,9 @@ int sfs_close(int fd){
 	 *
 	 */
 int sfs_create(char* pathname, int type){
-	sfs_buff = calloc(BUFFER_SIZE, sizeof(char*));
+	printf ("gets in. yay.\n");
+	//sfs_buff = (char*)calloc(BUFFER_SIZE, sizeof(char));
+	printf("Defines vars. yay.\n");
 	int blk_loc;
 	int i_number;
 	int* i_node=calloc(INODE_SIZE,sizeof(int));
@@ -288,7 +290,7 @@ int sfs_create(char* pathname, int type){
 	sprintf(sfs_buff+strlen(sfs_buff),"%d",i_number);
 	strcat(sfs_buff,"\n");
 	put_block(DATA_START,sfs_buff);
-	free(sfs_buff);
+	//free(sfs_buff);
 	return 1;
 }
 	/**
@@ -349,7 +351,7 @@ int sfs_delete(char* pathname){
 	 *Matthew Weeks
 	 */
 int sfs_initialize(int erase){
-	int* i_node_buff = calloc(BLOCKS, sizeof(int));
+	int* i_node_buff = (int*)calloc(BLOCKS, sizeof(int));
 	if(erase==1){
 		error_check=release_allblocks_fromfile();
 		if(error_check==-1){
@@ -362,17 +364,19 @@ int sfs_initialize(int erase){
 			return -1;
 		}
 	}
+	printf("getting superblock. yay\n");
 	error_check = get_super_blk();
+	printf("it got superblocl. yay\n");
 	if(error_check<0){
 		printf("Error in get super blk\n");
 		return -1;
 	}
-	error_check=put_super_blk();
+	//error_check=put_super_blk();
 	if(error_check<0){
 		printf("Error in putting super_blk back\n");
 		return -1;
 	}
-	free(i_node_buff);
+	//free(i_node_buff);
 	return 1;
 }
 
@@ -385,6 +389,52 @@ int sfs_exists(char* pathname){
 		return 1;
 	}
 	return -1;
+}
+
+int sfs_getsize(char* pathname) {
+	get_block(DATA_START, sfs_buff);
+	char* pntStr = strstr(sfs_buff, pathname);
+	if(pntStr == NULL){
+		printf("FILE NOT FOUND");
+		return -1;
+	}
+	int length = sizeof(pathname)/sizeof(char);
+	pntStr+=length;
+	char* pntEnd = strstr(pntStr, "\n");
+	char* store = calloc(1,sizeof(sfs_buff));
+	strncpy(store, pntStr, pntEnd-pntStr);
+	int* loc = (int*) store;
+
+	int size = 0;
+	int error = get_file_pointer(*loc, &size);
+	if(error < 0) {
+		return -1;
+	}
+	return size;
+}
+
+int sfs_gettype(char* pathname){
+	int* intBuff = NULL;
+	get_block(DATA_START, sfs_buff);
+	char* pntStr = strstr(sfs_buff, pathname);
+	if(pntStr == NULL){
+		printf("FILE NOT FOUND");
+		return -1;
+	}
+	int length = sizeof(pathname)/sizeof(char);
+	pntStr+=length;
+	char* pntEnd = strstr(pntStr, "\n");
+	char* store = calloc(1,sizeof(sfs_buff));
+	strncpy(store, pntStr, pntEnd-pntStr);
+	int* loc = (int*) store;
+	
+	error_check = get_inode(*loc, intBuff);
+	return(intBuff[0]); //File type stored in first location. 
+
+	free(pntStr);
+	free(pntEnd);
+	free(store);
+	free(loc);
 }
 	/*	get_inode_table
 		get_super_blk

@@ -284,6 +284,7 @@ int main()
       /* Initialize the file system */
       printf("Enter 1 to erase disk while initializing, 0 otherwise: ");
       scanf("%d",&p1);
+      printf("got input. yay \n");
       retval = sfs_initialize(p1);
       if (retval > 0) {
 	printf("sfs_initialize succeeded.\n");

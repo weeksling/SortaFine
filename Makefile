@@ -9,4 +9,4 @@ Sortafine: Sortafine.c open_file_table.c bitmap.c I_node.c blockio.c
 inode: I_node.c blockio.c
 	gcc -Wall -std=c99 I_node.c blockio.c -o inode.o
 sfstest: Sortafine.c open_file_table.c bitmap.c I_node.c blockio.c
-	gcc -Wall -std=c99 sfstest.c Sortafine.c open_file_table.c bitmap.c I_node.c blockio.c -lm -o sfstest.o
+	gcc -std=c99 sfstest.c Sortafine.c open_file_table.c bitmap.c I_node.c blockio.c -lm -o sfstest.out

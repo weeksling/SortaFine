@@ -98,6 +98,7 @@ int get_empty_blk(void){
   * @Contributors Matthew Weeks
   */
 int get_super_blk(void){
+	printf("it tried to get super block\n");
 	super_blk_buf = (short int*) calloc(DISK_SIZE, sizeof(short int));
 	disk_bitmap = (int*) calloc(BITMAP_BUFF, sizeof(int));
 	buff = (char*) calloc(BUFFER_SIZE, sizeof(char));
@@ -138,9 +139,6 @@ int get_super_blk(void){
 	if(error_check<0){
 		return -1;
 	}
-
-	free(buff);
-	free(super_blk_buf);
 
 	return 0;
 }
