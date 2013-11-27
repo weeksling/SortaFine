@@ -140,6 +140,9 @@ int get_super_blk(void){
 		return -1;
 	}
 
+	free(buff);
+	free(super_blk_buf);
+
 	return 0;
 }
 

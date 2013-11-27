@@ -258,7 +258,7 @@ int sfs_close(int fd){
 	 */
 int sfs_create(char* pathname, int type){
 	printf ("gets in. yay.\n");
-	//sfs_buff = (char*)calloc(BUFFER_SIZE, sizeof(char));
+	sfs_buff = (char*)calloc(BUFFER_SIZE, sizeof(char));
 	printf("Defines vars. yay.\n");
 	int blk_loc;
 	int i_number;
