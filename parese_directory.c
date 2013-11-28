@@ -20,4 +20,6 @@ int parse_directory(char* pathname) {
 		tempName = strtok(pathname, "/");
 	}
 
+
+	return curr_i_number;
 }
