@@ -11,12 +11,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define BUFFER_SIZE 512
-#define BITMAP_BUFF 512
+#define NUM_BLKS 512
 #define ROOT_DIR 11
 #define BITMAP_LOC 0
 #define CHECKSUM_LOC 1
-#define DISK_SIZE 512
 #define BLK_BUF_SIZE 128
 
 
@@ -28,9 +26,9 @@ int get_super_blk(void);
 int put_super_blk(void);
 
 // Global Variables //
-short int* super_blk_buf = NULL;
-int* disk_bitmap = NULL;
-char* buff = NULL;
+short int* super_blk_buf;
+int* disk_bitmap;
+char* buff;
 
 /** 
   * Set all entries of disk_bitmap to 0, marking them as free
@@ -42,7 +40,7 @@ int release_allblocks_fromfile(void){
 	if (disk_bitmap == NULL) {
 		return -1;
 	}
-	for (int i=0; i<DISK_SIZE; i++) {
+	for (int i=0; i<NUM_BLKS; i++) {
 		disk_bitmap[i] = 0;
 	}
 	put_super_blk();
@@ -66,7 +64,7 @@ int release_block(int blk_num){
 
 int init_super_block(){
 	super_blk_buf=(short int*) calloc(BLK_BUF_SIZE, sizeof(int));
-	disk_bitmap=(int*) calloc(DISK_SIZE, sizeof(int));
+	disk_bitmap=(int*) calloc(NUM_BLKS, sizeof(int));
 	int error_check=get_super_blk();
 	if (error_check<0)
 		return -1;
@@ -79,7 +77,7 @@ int init_super_block(){
   * @return 0 		if successful, -1 otherwise
   */
 int get_empty_blk(void){
-	for(int e = ROOT_DIR; e < BITMAP_BUFF; e++)
+	for(int e = ROOT_DIR; e < NUM_BLKS; e++)
 	{	
 		if(disk_bitmap == NULL){
 			return -1;
@@ -99,10 +97,12 @@ int get_empty_blk(void){
   */
 int get_super_blk(void){
 	printf("it tried to get super block\n");
-	super_blk_buf = (short int*) calloc(DISK_SIZE, sizeof(short int));
-	disk_bitmap = (int*) calloc(BITMAP_BUFF, sizeof(int));
-	buff = (char*) calloc(BUFFER_SIZE, sizeof(char));
-
+	super_blk_buf = (short int*) calloc(BLK_BUF_SIZE, sizeof(char));
+	printf("blk_buf defined\n");
+	disk_bitmap = (int*) calloc(NUM_BLKS, sizeof(char));
+	printf("disk_bitmap defined \n");
+	buff = (char*) calloc(BLK_BUF_SIZE, sizeof(char));
+	printf ("buff defined\n");
 	/* Check that disk is not corrupted */
 	int check=0;
 	if (*buff!=check){
@@ -113,14 +113,14 @@ int get_super_blk(void){
 	/* Get bitmap from disk */
 	int bitmap_pos = 0;
 	int current = 0;
-	int result = get_block(BITMAP_LOC, buff);
+	int result = get_block(BITMAP_LOC, (char*)super_blk_buf);
 	int error_check = get_block(CHECKSUM_LOC,buff);
-	super_blk_buf = (short int*) buff;
+
 	if (result < 0) {
 		return -1;
 	}
 
-	for(int i=0; i<DISK_SIZE; i++) {
+	for(int i=0; i<NUM_BLKS*sizeof(char)/sizeof(short int); i++) {
 		current = super_blk_buf[i];
 		for(int j=3; j>=0; j--) {
 			if (current >= pow(2,j)) {
@@ -132,15 +132,15 @@ int get_super_blk(void){
 			bitmap_pos++;
 		}
 	}
-	for (int i=0; i<DISK_SIZE; i++){
+	for (int i=0; i<NUM_BLKS; i++){
 		check += buff[i];
 	}
 
 	if(error_check<0){
 		return -1;
 	}
-
 	free(buff);
+	abort();
 	free(super_blk_buf);
 
 	return 0;
@@ -155,7 +155,7 @@ int put_super_blk(void){
 	// it in super_blk_buf[128]
 	// Puts super_blk_buf[128] into the super-block
 	char* buff = NULL;
-	buff = (char*) calloc(BUFFER_SIZE, sizeof(char));
+	buff = (char*) calloc(NUM_BLKS, sizeof(char));
 
 	int bitmap_pos = 0;
 	int toWrite = 0;
@@ -173,7 +173,7 @@ int put_super_blk(void){
 	buff = (char*) super_blk_buf;
 
 	int check=0;
-	for (int i=0; i<DISK_SIZE; i++){
+	for (int i=0; i<NUM_BLKS; i++){
 		check += disk_bitmap[i];
 	}
 

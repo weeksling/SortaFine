@@ -366,7 +366,7 @@ int sfs_initialize(int erase){
 	}
 	printf("getting superblock. yay\n");
 	error_check = get_super_blk();
-	printf("it got superblocl. yay\n");
+	printf("it got superblock. yay\n");
 	if(error_check<0){
 		printf("Error in get super blk\n");
 		return -1;
